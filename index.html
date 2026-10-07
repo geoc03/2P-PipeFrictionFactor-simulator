@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2P Next-Generation Pipe Friction Calculator v1.6 — Interactive 2P Nomogram</title>
+<style>
+:root{
+ --navy:#102b46; --blue:#1f5f8b; --blue2:#eaf3f9; --ink:#1b2733; --muted:#607080;
+ --line:#d8e1e8; --bg:#f6f8fa; --white:#fff; --green:#18794e; --amber:#9a6700; --red:#b42318;
+ --shadow:0 10px 28px rgba(16,43,70,.08);
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+header{background:linear-gradient(135deg,var(--navy),#174d76);color:white;padding:22px 0 26px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand h1{font-size:clamp(23px,3vw,38px);line-height:1.12;margin:9px 0 5px}
+.brand .lab{font-weight:750;letter-spacing:.06em;font-size:13px;opacity:.9}
+.version{font-size:12px;border:1px solid rgba(255,255,255,.35);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.subtitle{max-width:850px;color:#dbeaf4;margin:7px 0 0}
+main{padding:24px 0 56px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:20px}
+.card h2{font-size:20px;margin:0 0 14px;color:var(--navy)}
+.card h3{font-size:16px;color:var(--navy);margin:20px 0 9px}
+.full{grid-column:1/-1}
+.inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{font-size:12px;font-weight:750;color:#425466;display:block;margin-bottom:5px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;border:1px solid #cbd6df;border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(31,95,139,.18);border-color:var(--blue)}
+textarea{min-height:135px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}
+button{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}
+.primary{background:var(--blue);color:white}.secondary{background:#eaf2f7;color:var(--navy)}.ghost{background:white;border:1px solid var(--line);color:var(--navy)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.result{background:#f4f8fb;border:1px solid #d7e7f2;border-radius:12px;padding:14px;margin-top:14px}
+.big{font-size:28px;font-weight:800;color:var(--navy)}
+.eq{font-family:Cambria,Georgia,serif;background:#fbfcfd;border-left:4px solid var(--blue);padding:11px 13px;margin:10px 0;overflow:auto}
+.note{font-size:12px;color:var(--muted)}
+.warning{background:#fff8e6;border:1px solid #f0d184;color:#684d00;padding:10px 12px;border-radius:9px;font-size:12px;margin-top:10px}
+.status{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800}
+.status.Calibrated{color:var(--green);background:#e9f7ef}.status.Indicative{color:var(--amber);background:#fff5d6}.status.Research-only{color:var(--red);background:#ffebe9}.status.Independent-validation{color:#5a3d9a;background:#f0eafe}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:10px}.metric b{display:block;font-size:17px;color:var(--navy)}.metric span{font-size:11px;color:var(--muted)}
+.counterbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.counterbox{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:10px 12px}
+.counterbox b{display:block;font-size:21px;color:white}.counterbox span{font-size:11px;color:#dbeaf4}
+.benchgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.benchbox{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fbfcfd}
+.benchbox b{display:block;font-size:20px;color:var(--navy);margin-top:2px}
+.benchbox span{font-size:11px;color:var(--muted)}
+.consent{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:12px;color:#425466}.consent input{width:auto;margin-top:3px}
+.smallgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+code.config{background:#eef3f6;padding:2px 5px;border-radius:4px}
+canvas{width:100%;height:420px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:8px 0}.sw{display:inline-block;width:22px;height:3px;vertical-align:middle;margin-right:5px}
+table{border-collapse:collapse;width:100%;font-size:12px}.tablewrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:10px}
+th,td{padding:8px 9px;border-bottom:1px solid #e7edf2;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#eef4f8;color:var(--navy);z-index:1}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{padding:8px 11px;border-radius:999px;background:#edf3f7;color:var(--navy);cursor:pointer;font-size:12px;font-weight:750}.tab.active{background:var(--navy);color:white}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+footer{color:#657482;font-size:12px;margin-top:25px}
+@media(max-width:820px){.grid,.two{grid-template-columns:1fr}.full{grid-column:auto}.inputs{grid-template-columns:1fr 1fr}.metrics,.benchgrid{grid-template-columns:1fr 1fr}.brand{align-items:flex-start}.version{margin-top:4px}}
+@media(max-width:520px){.inputs,.benchgrid{grid-template-columns:1fr}.wrap{padding:0 14px}.card{padding:15px}canvas{height:350px}}
+</style>
+<meta name="description" content="L’CADAME/UFRJ two-parameter rough-pipe friction calculator with interactive nomogram, Colebrook comparisons and experimental data fitting.">
+<style>body{font-size:16px}label,.note,.n{font-size:14px!important}#references,#public-note{max-width:1200px;margin:20px auto;padding:24px;box-sizing:border-box}canvas{max-width:100%}input,select,textarea{max-width:100%;box-sizing:border-box}</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+   <div class="brand">
+    <div>
+      <div class="lab">L'CADAME · UFRJ · RESEARCH TOOL PROTOTYPE</div>
+      <h1>2P Next-Generation Pipe Friction Calculator</h1>
+      <div class="subtitle">Colebrook–White versus the explicit two-parameter (2P) rough-wall friction model. The 2P formulation is a new rough-wall friction approach with two hydraulic surface parameters; it is <b>not</b> an explicit approximation of the Colebrook equation.</div>
+      <div class="counterbar">
+       <div class="counterbox"><span>Public calculator users</span><b id="globalUsers">—</b><span id="globalCounterNote">Backend counter not connected in offline prototype</span></div>
+       <div class="counterbox"><span>Calculations on this browser</span><b id="localCalculations">0</b><span>Stored locally on this device</span></div>
+       <div class="counterbox"><span>Voluntary data contributions</span><b id="globalContrib">—</b><span id="contribCounterNote">Activated with research-data endpoint</span></div>
+      </div>
+    </div>
+    <div class="version">Public Research Edition v1.6</div>
+   </div>
+ </div>
+</header>
+
+<main class="wrap">
+<div class="grid">
+
+
+<section class="card full" id="next-generation-hero" style="text-align:center">
+ <div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.75">Beyond Equivalent Roughness</div>
+ <h2 style="font-size:28px;margin:8px 0 8px">A next-generation approach to pipe friction and hydraulic surface characterization</h2>
+ <p class="note" style="font-size:15px;line-height:1.65;max-width:900px;margin:0 auto">
+  Most conventional turbulent pipe-friction calculators reduce the wall to a single equivalent roughness. The 2P framework introduces two independent hydraulic coordinates, <b>k</b> and <b>q</b>, so measured friction can retain information associated with roughness scale and additional morphology-dependent resistance.
+ </p>
+ <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+  <a href="#why2p" class="btn" style="text-decoration:none">Why 2P?</a>
+  <a href="#talk-to-us" class="btn ghost" style="text-decoration:none">Talk to us</a>
+ </div>
+ <div class="warning" style="text-align:left;margin-top:18px">
+  <b>Have pressure-drop or friction-factor data that a conventional equivalent-roughness model does not represent satisfactorily?</b>
+  Use this research calculator to compare approaches, or contact us about an independent 2P assessment of your dataset.
+ </div>
+</section>
+
+<section class="card full" id="why2p">
+ <h2>Why a next-generation 2P formulation beyond Colebrook–White?</h2>
+ <div class="warning" style="margin-top:0">
+  <b>Engineering perspective.</b> Colebrook–White remains a useful and widely adopted engineering correlation. The 2P formulation is not an explicit approximation to Colebrook and is not proposed merely to replace an iterative equation with an explicit one. Its main purpose is to provide a richer hydraulic description when a single equivalent relative roughness is insufficient to represent the measured friction behavior.
+ </div>
+ <div class="two" style="margin-top:14px">
+  <div>
+   <h3>Limitations of a one-roughness-parameter description</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    Colebrook–White represents wall condition through one equivalent relative roughness, ε/D. This is very effective when the surface can be represented adequately by an equivalent sand-grain roughness. However, real engineered surfaces can differ in element shape, spacing, density, orientation and form drag even when they have similar characteristic roughness heights. A single ε/D cannot independently retain both a roughness length scale and this additional morphology-dependent hydraulic information.
+   </p>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    The consequence is practical: two surfaces may have comparable equivalent roughness heights yet exhibit different friction-factor curves. In such cases, forcing the entire Reynolds-number dependence into one Colebrook roughness parameter can produce systematic residuals or an apparent roughness that changes when different portions of the data are fitted.
+   </p>
+  </div>
+  <div>
+   <h3>What the second 2P coordinate adds</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    The 2P model uses two independent hydraulic surface coordinates, <b>k</b> and <b>q</b>. In this calculator, <b>k = k<sub>s</sub>/R</b> represents the roughness-scale coordinate, whereas <b>q</b> provides an additional degree of freedom associated with the hydraulic influence of surface morphology and additional resistance not captured by roughness height alone. Thus, the model can distinguish surfaces that a one-parameter equivalent-roughness description may collapse onto the same ε/D.
+   </p>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    Once Re, k and q are specified, the 2P friction factor is evaluated explicitly. This is computationally convenient, but the more important advantage is physical and descriptive: the second coordinate permits the measured friction curve to carry information beyond a single equivalent sand-grain roughness.
+   </p>
+  </div>
+ </div>
+ <h3>Why engineers may prefer 2P when suitable data are available</h3>
+ <p class="note" style="font-size:13px;line-height:1.65">
+  For multi-point hydraulic measurements, the 2P approach can be calibrated against the complete friction curve and compared directly with the best Colebrook fit. In the experimental database used by this research calculator, several calibrated rough-surface cases show lower 2P MAPE than the corresponding globally fitted Colebrook correlation. For example, the Taylor cone A5 case gives 1.42% versus 9.08%, and the Taylor small-hemisphere B3 case gives 3.13% versus 7.01%. These examples do not establish universal superiority, but they demonstrate why a second hydraulic coordinate can be valuable for morphology-sensitive surfaces.
+ </p>
+ <div class="warning">
+  <b>Recommended use.</b> Use Colebrook when a conventional equivalent-roughness description is adequate, when only ε/D is known, or when compatibility with established design standards is the priority. Use 2P when sufficiently rich friction data are available and the objective is to characterize a real surface more faithfully, distinguish morphology-sensitive hydraulic behavior, or obtain a compact explicit friction model over the calibrated Reynolds-number range. The improvement should always be checked against experimental data and model-adequacy statistics rather than assumed in advance.
+ </div>
+</section>
+
+
+
+<section class="card full" id="validation">
+ <h2>Validate before you adopt</h2>
+ <p class="note" style="font-size:13px;line-height:1.65">
+  2P is intended to complement established engineering practice where a single equivalent roughness is not sufficient. The calculator therefore keeps Colebrook–White as a visible benchmark and reports comparative fit information where experimental datasets are available. A second parameter should be retained only when the measurements support it.
+ </p>
+ <div class="two" style="margin-top:12px">
+  <div><h3>Smooth-wall consistency</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">The physically smooth limit corresponds to <b>k = 0</b> and <b>q = 0</b>. This provides a direct baseline for checking that additional surface coordinates disappear when no roughness contribution is required.</p>
+  </div>
+  <div><h3>Experimental comparison</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">For rough surfaces, judge the model from the complete friction curve—not from a single operating point. Compare 2P and Colebrook using residuals and error metrics over the measured Reynolds-number range, and examine whether the inferred parameters remain physically and statistically meaningful.</p>
+  </div>
+ </div>
+</section>
+
+<section class="card full" id="talk-to-us">
+ <h2>Talk to us — test 2P on your data</h2>
+ <p class="note" style="font-size:13px;line-height:1.65">
+  Are you working with a pipe, coating, corroded or scaled surface, manufactured roughness, or experimental friction data that cannot be represented satisfactorily by a conventional equivalent roughness? We are interested in discussing engineering applications, validation datasets, research collaborations and industrial case studies involving the 2P methodology.
+ </p>
+ <div class="two" style="margin-top:12px">
+  <div>
+   <h3>What you can bring</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    Useful information includes Reynolds number and friction-factor measurements or, alternatively, flow rate, pipe diameter, pressure drop, test-section length and fluid properties. Surface measurements, photographs, profilometry, nominal roughness, corrosion/scaling information and operating history can further strengthen the hydraulic interpretation.
+   </p>
+  </div>
+  <div>
+   <h3>What we can investigate</h3>
+   <p class="note" style="font-size:13px;line-height:1.6">
+    The L'CADAME/UFRJ team can evaluate whether a two-parameter description is justified, estimate <b>k</b> and <b>q</b>, compare the result with Colebrook–White, assess parameter identifiability and uncertainty, and examine whether the inferred hydraulic signature is consistent with the available information about the surface.
+   </p>
+  </div>
+ </div>
+ <div class="warning">
+  <b>Interested in testing the 2P approach on your data?</b> Contact the L'CADAME/UFRJ research team to discuss a dataset, engineering application, collaborative validation study or technology-development project. This calculator is intended as an entry point for technical discussion; engineering conclusions for a specific installation should be based on an appropriate characterization and validation of the available data.
+ </div>
+</section>
+
+
+<section class="card">
+ <h2>Quick 2P calculation</h2>
+ <div class="inputs">
+  <div><label>Reynolds number, Re</label><input id="Re" type="number" value="100000" min="1"></div>
+  <div><label>2P parameter k</label><input id="k" type="number" value="0.001" step="any" min="0"></div>
+  <div><label>2P parameter q</label><input id="q" type="number" value="0.001" step="any" min="0"></div>
+ </div>
+ <div class="actions"><button class="primary" onclick="calculate();bumpLocalCalculation()">Calculate friction factor</button><button class="secondary" onclick="resetDefaults()">Reset</button></div>
+ <div class="result">
+   <div class="note">Darcy friction factor</div><div id="f2pResult" class="big">—</div>
+   <div id="calcNote" class="note"></div>
+ </div>
+ <h3>Explicit 2P equation</h3>
+ <div class="eq">f₂P = [ (C<sub>bl</sub>/Re<sup>1/4</sup> + q)<sup>12</sup> + (C<sub>e</sub>/Re<sup>2/13</sup> + q)<sup>12</sup> + F<sub>r</sub>(k)<sup>12</sup> ]<sup>1/12</sup></div>
+ <div class="note">Circular-pipe constants used here: C<sub>bl</sub> = 0.310 and C<sub>e</sub> = 0.09435. The 2P evaluation is explicit once Re, k and q are known.</div>
+</section>
+
+<section class="card">
+ <h2>Compare with Colebrook</h2>
+ <div class="inputs">
+  <div><label>Equivalent relative roughness, ε/D</label><input id="eps" type="number" value="0.001" step="any" min="0"></div>
+  <div><label>Reynolds number</label><input id="ReCB" type="number" value="100000" min="1"></div>
+  <div><label>Iteration tolerance</label><input id="tol" type="number" value="1e-12" step="any"></div>
+ </div>
+ <div class="actions"><button class="primary" onclick="compareColebrook();bumpLocalCalculation()">Compare</button></div>
+ <div class="metrics">
+   <div class="metric"><span>2P friction factor</span><b id="m2p">—</b></div>
+   <div class="metric"><span>Colebrook friction factor</span><b id="mcb">—</b></div>
+   <div class="metric"><span>2P − Colebrook</span><b id="mdiff">—</b></div>
+ </div>
+ <h3>Colebrook–White equation</h3>
+ <div class="eq">1/√f<sub>CB</sub> = −2 log<sub>10</sub>[ (ε/D)/3.7 + 2.51/(Re√f<sub>CB</sub>) ]</div>
+ <div class="note" style="margin-top:10px">Colebrook is solved iteratively because the Darcy friction factor f<sub>CB</sub> appears on both sides of the equation. In contrast, the 2P model is evaluated directly from Re, k and q. The 2P equation is not derived as an explicit approximation to Colebrook; it represents a different two-parameter hydraulic description of rough-wall friction. A live computational-effort comparison is provided below.</div>
+</section>
+
+<section class="card full">
+ <h2>Interactive friction diagram</h2>
+ <div class="two">
+  <div class="inputs">
+   <div><label>Minimum Re</label><input id="reMinPlot" type="number" value="4000"></div>
+   <div><label>Maximum Re</label><input id="reMaxPlot" type="number" value="10000000"></div>
+   <div><label>Show Colebrook</label><select id="showCB"><option value="yes">Yes</option><option value="no">No</option></select></div>
+  </div>
+  <div>
+   <label>Load a tested surface preset</label>
+   <select id="preset" onchange="loadPreset()"><option value="">— Choose a calibrated / indicative surface —</option></select>
+   <div id="presetInfo" class="note" style="margin-top:7px"></div>
+  </div>
+ </div>
+ <div class="actions"><button class="primary" onclick="drawPlot()">Update plot</button></div>
+ <div class="legend"><span><i class="sw" style="background:#1f5f8b"></i>2P</span><span><i class="sw" style="background:#9a6700"></i>Colebrook</span><span id="dataLegend" style="display:none"><i class="sw" style="background:#b42318"></i><span id="dataLegendText">Experimental data</span></span></div>
+ <canvas id="plot" width="1100" height="460"></canvas>
+ <div class="note">Horizontal axis: Reynolds number Re on a logarithmic scale. Major powers of ten are always labeled; for narrower ranges, intermediate 2×10ⁿ and 5×10ⁿ labels are added automatically so the axis remains readable. 10⁴ = 10,000; 10⁵ = 100,000; 10⁶ = 1,000,000.</div>
+</section>
+
+<section class="card full" id="interactive2pchart">
+ <h2>Interactive 2P friction chart — graphical map of (Re, q) → X → (k, f<sub>2P</sub>)</h2>
+ <p class="note">Use the controls below exactly as in the 2P simulator, or click directly on the chart. The lower panel selects the pair (Re,q) and determines X(Re,q); the upper panel then uses that same X with k to obtain the Darcy friction factor.</p>
+
+ <div class="three" style="align-items:end;margin-top:10px">
+   <label><b>Re</b><input id="nomRe" type="number" min="1000" max="100000000" step="1000" value="100000" oninput="draw2PNomogram()"></label>
+   <label><b>q</b><input id="nomQ" type="number" min="0" max="0.10" step="0.001" value="0.020" oninput="draw2PNomogram()"></label>
+   <label><b>k</b><input id="nomK" type="number" min="0" max="0.15" step="0.001" value="0.020" oninput="draw2PNomogram()"></label>
+ </div>
+
+ <div class="actions">
+   <button class="primary" onclick="draw2PNomogram()">Update chart</button>
+   <button class="secondary" onclick="syncNomogramToQuick()">Use Quick 2P values</button>
+ </div>
+
+ <div class="metrics" style="margin-top:10px">
+   <div class="metric"><span>X(Re,q)</span><b id="nomXOut">—</b></div>
+   <div class="metric"><span>f<sub>2P</sub></span><b id="nomFOut">—</b></div>
+   <div class="metric"><span>Selected Re</span><b id="nomReOut">—</b></div>
+   <div class="metric"><span>Reading path</span><b id="nomPathOut">—</b></div>
+ </div>
+
+ <canvas id="twoPNomogram" width="1500" height="1420"
+   style="width:100%;height:auto;display:block;border:1px solid #d8e2e8;border-radius:8px;background:#fff;cursor:crosshair"></canvas>
+
+ <div class="note"><b>Interactive reading:</b> click the lower panel to select q and the corresponding constant-Re curve; click the upper panel to select the nearest k value. The red guide now runs only from the selected lower point to the shared X axis and from that axis to the selected upper point, rather than crossing the entire lower plot.</div>
+</section>
+
+<section class="card full">
+ <h2>Computational effort: 2P versus Colebrook</h2>
+ <p>The 2P friction factor is evaluated explicitly once Re, k and q are known. The Colebrook–White equation is implicit and requires iteration because the friction factor appears on both sides of the equation. For a single engineering calculation the absolute time difference is usually small, but repeated evaluations can matter in pipeline-network solvers, transient simulations, optimization, Monte Carlo studies, and digital-twin applications.</p>
+ <div class="two">
+  <div>
+   <h3>Structural comparison</h3>
+   <table>
+    <tbody>
+     <tr><th>Feature</th><th>2P model</th><th>Colebrook</th></tr>
+     <tr><td>Surface description</td><td>k, q</td><td>ε/D</td></tr>
+     <tr><td>Friction-factor equation</td><td><b>Explicit</b></td><td><b>Implicit</b></td></tr>
+     <tr><td>Iteration required</td><td><b>No</b></td><td><b>Yes</b></td></tr>
+     <tr><td>Per-evaluation structure</td><td>Direct formula evaluation</td><td>Repeated logarithmic updates until convergence</td></tr>
+     <tr><td>Repeated large calculations</td><td>Potential computational advantage</td><td>Higher numerical overhead</td></tr>
+    </tbody>
+   </table>
+  </div>
+  <div>
+   <h3>Live browser benchmark</h3>
+   <div class="inputs">
+    <div><label>Number of evaluations</label><input id="benchN" type="number" value="100000" min="1000" step="1000"></div>
+    <div><label>Re minimum</label><input id="benchReMin" type="number" value="4000"></div>
+    <div><label>Re maximum</label><input id="benchReMax" type="number" value="10000000"></div>
+   </div>
+   <div class="actions"><button class="primary" onclick="runBenchmark()">Benchmark both methods</button></div>
+   <div class="benchgrid">
+    <div class="benchbox"><span>2P total time</span><b id="bench2p">—</b></div>
+    <div class="benchbox"><span>Colebrook total time</span><b id="benchCb">—</b></div>
+    <div class="benchbox"><span>Colebrook / 2P</span><b id="benchRatio">—</b></div>
+    <div class="benchbox"><span>Colebrook iterations</span><b id="benchIter">—</b></div>
+   </div>
+   <div id="benchNote" class="note" style="margin-top:10px">Browser benchmark only. Timing depends on hardware, browser, solver tolerance, and implementation. It should not be interpreted as a universal speedup factor.</div>
+  </div>
+ </div>
+</section>
+
+<section class="card">
+ <h2>Pressure-drop calculation</h2>
+ <div class="inputs">
+  <div><label>Density ρ (kg/m³)</label><input id="rho" type="number" value="998"></div>
+  <div><label>Velocity U (m/s)</label><input id="U" type="number" value="2"></div>
+  <div><label>Diameter D (m)</label><input id="D" type="number" value="0.1"></div>
+  <div><label>Pipe length L (m)</label><input id="L" type="number" value="100"></div>
+  <div><label>Dynamic viscosity μ (Pa·s)</label><input id="mu" type="number" value="0.001"></div>
+ </div>
+ <div class="actions"><button class="primary" onclick="pressureDrop();bumpLocalCalculation()">Calculate ΔP</button></div>
+ <div class="result"><div class="note">2P pressure drop</div><div id="dp" class="big">—</div><div id="dpmeta" class="note"></div></div>
+</section>
+
+<section class="card">
+ <h2>Parameter status</h2>
+ <p class="note">The parameter database distinguishes the epistemic status of each pair. k and q are hydraulic descriptors of a tested rough surface configuration; they are not universal material constants.</p>
+ <p><span class="status Calibrated">Calibrated</span> Exact tested surface, well-populated curve, both parameters resolved away from the numerical lower bound.</p>
+ <p><span class="status Indicative">Indicative</span> Useful engineering starting estimate, but limited generality; recalibration is recommended.</p>
+ <p><span class="status Research-only">Research-only</span> One parameter is poorly resolved, the curve is sparse, or the fit is not strong enough for a calculator default.</p>
+ <p><span class="status Independent-validation">Independent validation</span> Dataset not included in the original 53/649 calibration database. Used to test the model independently; fitted parameters may carry specific identifiability limitations.</p>
+ <div class="warning">Do not silently assign k and q from a material name alone. Manufacturing, roughness amplitude, spacing, geometry, aging and surface condition may change the hydraulic response.</div>
+</section>
+
+<section class="card full">
+ <h2>Fit your experimental friction data</h2>
+ <div class="two">
+  <div>
+   <label>Paste two columns: Re, Darcy f</label>
+   <textarea id="fitData" placeholder="Example:
+10000, 0.0321
+20000, 0.0280
+50000, 0.0245
+100000, 0.0231"></textarea>
+   <div class="actions"><button class="primary" onclick="fitData();bumpLocalCalculation()">Fit 2P + Colebrook</button><button class="ghost" onclick="clearFit()">Clear</button></div>
+   <div class="note">The prototype minimizes squared logarithmic residuals, consistent with the calibration methodology used in the engineering manuscript.</div>
+  </div>
+  <div>
+   <div class="metrics">
+    <div class="metric"><span>Fitted k</span><b id="fitK">—</b></div>
+    <div class="metric"><span>Fitted q</span><b id="fitQ">—</b></div>
+    <div class="metric"><span>Fitted ε/D</span><b id="fitEps">—</b></div>
+   </div>
+   <div class="metrics">
+    <div class="metric"><span>2P MAPE</span><b id="fitM2">—</b></div>
+    <div class="metric"><span>Colebrook MAPE</span><b id="fitMC">—</b></div>
+    <div class="metric"><span>Identification note</span><b id="fitStatus" style="font-size:13px">—</b></div>
+   </div>
+   <div id="fitWarning" class="warning" style="display:none"></div>
+  </div>
+ </div>
+</section>
+
+<section class="card full">
+ <h2>Additional independent validation — Botros</h2>
+ <p>The Botros data are kept separate from the core 53-dataset / 649-measurement database used in the engineering manuscript. This prevents the independent test from being confused with the data used for the main model assessment.</p>
+ <div class="two">
+  <div>
+   <h3>Botros Pipe #1</h3>
+   <p class="note">20 individual high-Reynolds-number measurements are available for Pipe #1. The measured interval is narrow and already close to a high-Re friction plateau, so the friction curve can be validated accurately while k and q remain less strongly identifiable individually.</p>
+   <div class="metrics">
+    <div class="metric"><span>2P fitted k</span><b>1.482×10⁻⁴</b></div>
+    <div class="metric"><span>2P fitted q</span><b>9.250×10⁻⁴</b></div>
+    <div class="metric"><span>2P MAPE</span><b>0.027%</b></div>
+   </div>
+  </div>
+  <div>
+   <h3>Colebrook comparison</h3>
+   <div class="metrics">
+    <div class="metric"><span>Global fitted ε/D</span><b>2.683×10⁻⁵</b></div>
+    <div class="metric"><span>Botros reported ε/D</span><b>2.640×10⁻⁵</b></div>
+    <div class="metric"><span>Global Colebrook MAPE</span><b>0.190%</b></div>
+   </div>
+   <div class="warning">These Botros k and q values are shown for validation/research use. They should not be offered as a normal material preset because the narrow high-Re interval does not strongly separate the two parameters.</div>
+  </div>
+ </div>
+ <div class="actions"><button class="primary" onclick="selectBotros()">Load Botros Pipe #1 into plot</button></div>
+</section>
+
+<section class="card full">
+ <h2>Core 2P parameter database — 53 datasets / 649 measurements</h2><p class="note"><b>ℓ<sub>t</sub>=kR</b> is the turbulent roughness length and <b>ℓ<sub>d</sub>=qR</b> is the dynamic roughness length. Colebrook ε/D and k<sub>s,C</sub>=D(ε/D) are fitted independently.</p>
+ <div class="tabs">
+  <div class="tab active" data-filter="all" onclick="setFilter(this)">All</div>
+  <div class="tab" data-filter="Calibrated" onclick="setFilter(this)">Calibrated</div>
+  <div class="tab" data-filter="Indicative" onclick="setFilter(this)">Indicative</div>
+  <div class="tab" data-filter="Research-only" onclick="setFilter(this)">Research-only</div>
+ </div>
+ <div class="tablewrap">
+  <table><thead><tr>
+<th>Status</th><th>Source</th><th>Surface class</th><th>Case</th><th>N</th><th>Re range</th>
+<th>D or D<sub>h</sub> (mm)</th><th>R (mm)</th>
+<th>q</th><th>k</th><th>ℓ<sub>d</sub>=qR (mm)</th><th>ℓ<sub>t</sub>=kR (mm)</th>
+<th>Colebrook ε/D</th><th>Colebrook k<sub>s,C</sub> (mm)</th>
+<th>MAPE 2P</th><th>MAPE CB</th><th>Dimension status</th>
+</tr></thead><tbody id="dbBody"></tbody></table>
+ </div>
+</section>
+
+<section class="card full">
+ <h2>Contribute an experimental dataset (optional)</h2>
+ <p>If you calibrate the 2P model using your own experimental data, you may optionally identify the material/surface and volunteer the dataset for possible inclusion in the L'CADAME research database. <b>Nothing is shared automatically.</b> Contribution requires an explicit opt-in.</p>
+ <div class="two">
+  <div>
+   <h3>Surface identification</h3>
+   <div class="smallgrid">
+    <div><label>Material / surface name</label><input id="matName" placeholder="e.g., galvanized steel, concrete, coated pipe"></div>
+    <div><label>Surface condition</label><input id="matCondition" placeholder="e.g., new, aged, corroded, machined"></div>
+    <div><label>Pipe / passage diameter D (m)</label><input id="matD" type="number" step="any" placeholder="optional"></div>
+    <div><label>Measured roughness height (m)</label><input id="matRough" type="number" step="any" placeholder="optional"></div>
+    <div><label>Roughness descriptor</label><input id="matDescriptor" placeholder="Rq, Ra, ks, spacing, element height, etc."></div>
+    <div><label>Organization / laboratory</label><input id="matOrg" placeholder="optional"></div>
+   </div>
+   <label style="margin-top:10px">Surface / experiment notes</label>
+   <textarea id="matNotes" placeholder="Describe geometry, manufacturing process, roughness spacing, measurement method, uncertainty, fluid, temperature, or anything needed to interpret the data."></textarea>
+  </div>
+  <div>
+   <h3>Attribution and consent</h3>
+   <div class="smallgrid">
+    <div><label>Name</label><input id="contribName" placeholder="optional unless attribution requested"></div>
+    <div><label>Email</label><input id="contribEmail" type="email" placeholder="optional; for follow-up only"></div>
+   </div>
+   <label style="margin-top:10px">Preferred attribution</label>
+   <select id="attribution">
+    <option value="anonymous">Anonymous contribution</option>
+    <option value="name">Credit my name</option>
+    <option value="organization">Credit my organization/laboratory</option>
+    <option value="contact">Contact me before any public use</option>
+   </select>
+   <label class="consent"><input id="rightsConsent" type="checkbox"> <span>I confirm that I have the right to share these experimental data for research evaluation.</span></label>
+   <label class="consent"><input id="researchConsent" type="checkbox"> <span>I voluntarily authorize L'CADAME/UFRJ researchers to analyze these data and, after technical review, use them to enlarge the 2P validation database and in future scientific work, subject to the attribution preference selected above.</span></label>
+   <label class="consent"><input id="contactConsent" type="checkbox"> <span>If I provided an email address, I permit contact regarding clarification of this dataset. (Optional.)</span></label>
+   <div class="warning">Before public deployment, this contribution workflow should link to the laboratory's privacy/data-use notice. The calculator should store only the information the contributor explicitly submits.</div>
+   <div class="actions"><button class="primary" onclick="prepareContribution()">Prepare contribution</button><button class="ghost" onclick="clearContribution()">Clear form</button></div>
+   <div id="contribStatus" class="note"></div>
+  </div>
+ </div>
+ <h3>What is included in a contribution?</h3>
+ <p class="note">The package includes the pasted experimental Re,f points, fitted k and q, fitted Colebrook ε/D, fit-error statistics, the material/surface information entered above, and the explicit consent choices. In this offline prototype, clicking “Prepare contribution” downloads a JSON package to your computer. When the L'CADAME page is deployed with a secure backend, the same button can submit that package directly to the research database.</p>
+</section>
+
+<section class="card full">
+ <h2>Theory, references and use</h2>
+ <p><b>What is new about the 2P model?</b> The 2P formulation is not another explicit approximation of the implicit Colebrook equation. It is a distinct rough-wall friction model that represents the hydraulic action of the surface with two independent parameters, <b>k</b> and <b>q</b>, rather than collapsing the wall condition into the single equivalent roughness ε/D used by Colebrook.</p>
+ <p>The 2P formulation distinguishes an effective roughness-induced vortex/dissipative contribution, represented through <b>k</b>, from an additional geometry-dependent/form-drag-related contribution represented by <b>q</b>. The parameter pair should be determined for a surface configuration and retained over its operating range. The hydraulic coordinate k = ℓ(r)/R is not automatically a physical roughness height or equivalent sand-grain roughness; q represents an additional dimensionless resistance. This calculator evaluates turbulent single-phase wall friction, not a multiphase flow model.</p>
+ <p class="note"><b>Primary theory:</b> Cruz, D. O. A., Anbarlooei, H., Santos, C. M. M., and Celis, G. E. O. (2026), “An improved two-parameter model for turbulent rough-wall flows: Addressing the limitations of Colebrook and Gioia–Chakraborty type models,” <i>Physics of Fluids</i> 38, 065155, DOI 10.1063/5.0325227.</p>
+ <p class="note"><b>Near-wall/friction basis:</b> Anbarlooei, H. R., Celis, G. E. O., Santos, C. M. M., and Cruz, D. O. A., “On the turbulent friction and the near wall structure of pipe flows.”</p>
+ <p class="note"><b>Engineering validation:</b> manuscript in preparation. This public research edition provides the current model and calibration database for technical evaluation.</p>
+ <div class="warning">Engineering use should remain within the Reynolds-number and geometry ranges for which the selected parameters were established. Non-circular passages require an independently established smooth-wall baseline.</div>
+ <p class="note"><b>Usage statistics and contributed datasets:</b> a true laboratory-wide user counter and direct dataset submission require a small secure server/database endpoint. This release uses a calculation counter stored only in your browser and downloads contribution packages only when requested. No calculator inputs or contributed datasets are sent to a server. Your browser may clear or block local storage.</p>
+</section>
+</div>
+
+<footer>
+ Research calculator developed for L'CADAME/UFRJ. Core validation: 53 datasets / 649 measurements. Additional independent validation: Botros Pipe #1 (20 measurements). Optional research-data contribution requires explicit user consent. Calculations run in your browser. No calculator inputs or contributed datasets are transmitted by the application. Hosting may retain standard access logs.
+<p>Scientific contact: <a href="mailto:daniel.cruz@ufrj.br">Daniel Onofre de Almeida Cruz</a> · <a href="https://lcadame.github.io/" target="_blank" rel="noopener">L’CADAME / UFRJ</a></p><p>Use for research and technical evaluation. Cite the model and data sources when reporting results. No redistribution license is granted for third-party source data.</p></footer>
+</main>
+
+<script>
+const safeStorage={getItem(k){try{return localStorage.getItem(k)}catch{return null}},setItem(k,v){try{localStorage.setItem(k,v)}catch{}}};
+// Deployment configuration.
+// Leave blank for offline/local prototype. On the L'CADAME server these can point to
+// privacy-reviewed HTTPS endpoints that increment anonymous usage and receive opt-in datasets.
+const COUNTER_ENDPOINT = "";
+const CONTRIBUTION_ENDPOINT = "";
+
+function getVisitorId(){
+ let id=safeStorage.getItem("2pVisitorId");
+ if(!id){id=(crypto.randomUUID?crypto.randomUUID():"v-"+Date.now()+"-"+Math.random().toString(36).slice(2));safeStorage.setItem("2pVisitorId",id);}
+ return id;
+}
+function bumpLocalCalculation(){
+ const n=(parseInt(safeStorage.getItem("2pCalcCount")||"0",10)+1);
+ safeStorage.setItem("2pCalcCount",String(n)); $("localCalculations").textContent=n.toLocaleString();
+}
+async function initUsageCounters(){
+ $("localCalculations").textContent=(parseInt(safeStorage.getItem("2pCalcCount")||"0",10)).toLocaleString();
+ if(!COUNTER_ENDPOINT) return;
+ try{
+   const seen=safeStorage.getItem("2pVisitorRegistered")==="yes";
+   const res=await fetch(COUNTER_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({event:seen?"status":"visitor",visitor_id:getVisitorId()})});
+   if(res.ok){
+     const j=await res.json();
+     if(j.users!=null)$("globalUsers").textContent=Number(j.users).toLocaleString();
+     if(j.contributions!=null)$("globalContrib").textContent=Number(j.contributions).toLocaleString();
+     $("globalCounterNote").textContent="Anonymous unique-browser counter";
+     $("contribCounterNote").textContent="Opt-in datasets received";
+     safeStorage.setItem("2pVisitorRegistered","yes");
+   }
+ }catch(e){$("globalCounterNote").textContent="Counter temporarily unavailable";}
+}
+
+const EXP_DB = {"Colebrook (1939)||Galvanized iron — H.2 / S = 0.063 branch": [[93698.35094272904, 0.031853272536190316], [111073.97945888649, 0.03178447499139717], [131360.67888431586, 0.03195688842614819], [150278.28405521682, 0.03117520205910921], [163882.01297242023, 0.03091002344790668], [186858.96771515146, 0.031141868512110732], [199193.13224475252, 0.031141868512110732], [211928.736977686, 0.03091002344790668], [224199.3433127821, 0.030942985347402488], [240872.5772221148, 0.030811453146220004], [271686.82059134665, 0.030746001325833078], [281859.0486934687, 0.030844257459197916]], "Colebrook (1939)||Galvanized iron — H.4 branch": [[22002.398455563547, 0.024390959532284873], [22840.4968635929, 0.024093581328337325], [23676.734228995174, 0.023935701978750633], [26897.291478117084, 0.023147749598740452], [363590.2756854634, 0.021918344204952825], [1045209.1254697867, 0.022977936328117336]], "Colebrook (1939)||Galvanized iron — S = 0.035": [[17969.89249141748, 0.057936595339216385], [19342.2758142575, 0.058964275446008706], [21859.603273427212, 0.05827614974990488], [26290.58011460143, 0.0586186980189679], [29581.664736967043, 0.05844704745803646], [30564.075759496336, 0.05844704745803646]], "Colebrook (1939)||Galvanized iron — S = 0.049": [[15256.998298874427, 0.037111896970012964], [16919.694765443262, 0.037025389081080155], [17118.682433432365, 0.03535685586967638], [21560.09413786593, 0.035518579413379193], [25377.1036474776, 0.03605191475725044], [27714.27715542891, 0.035845373132559755], [29435.532925529802, 0.035599857600569586], [37964.52216923784, 0.03410191556315603], [49269.13801499517, 0.03357379653046106]], "Colebrook (1939)||Galvanized iron — S = 0.085": [[10967.430803370553, 0.03124202991144649], [13189.25141998985, 0.03134267531175745], [14131.779594172212, 0.03164754687920024], [14749.09624852694, 0.031818845872899924], [52844.53065671287, 0.032696565959842376], [56414.7997859882, 0.030713353596437818], [60653.35874828328, 0.030713353596437818], [64016.56553920834, 0.03124202991144649], [64217.85360263533, 0.032768347641777266], [69268.26964277777, 0.031108588398524723], [72489.87936479421, 0.030844257459197916], [77656.45903524008, 0.032235682206495454]], "Colebrook (1939)||Galvanized iron — S = 1.04": [[13247.282876578445, 0.03790429947529172], [15540.637727396008, 0.045152829266330796], [17614.47200128596, 0.04538632767094787], [33891.49448247508, 0.03754901801904622], [35107.99357834106, 0.037460978147762745], [37328.43584291677, 0.03754901801904622]], "Colebrook (1939)||Tar-coated cast iron — Fig5 lower - branch 1": [[33435.9941378512, 0.026979809868718875], [68935.7598676552, 0.023203921536869683], [97558.57457521376, 0.022488346497670505], [243306.54483360413, 0.02077559468599007], [482404.99390911014, 0.018190111052998864]], "Colebrook (1939)||Tar-coated cast iron — Fig5 lower - branch 2": [[462353.1555856713, 0.02040816326530612], [682984.3521304909, 0.018709431464131423], [799841.244996814, 0.019587819151985045], [1069426.3251794514, 0.018292230774103795]], "Colebrook (1939)||Tar-coated cast iron — Fig5 lower - branch 3": [[308966.5042781306, 0.018499067075693265], [584403.7075225376, 0.016755574808115403], [659890.9347884645, 0.016228910019714844], [728075.5738589636, 0.015974840987095843], [801168.1920303109, 0.015808761896677948], [870637.1838048957, 0.015564457596474025]], "Colebrook (1939)||Tar-coated cast iron — Fig5 upper - branch 1": [[262841.17921353335, 0.023351130820621513], [482309.30814379477, 0.021805369123587954], [709483.3558817146, 0.02077559468599007], [1078797.0297345328, 0.02090027914545021]], "Colebrook (1939)||Tar-coated cast iron — Fig5 upper - branch 2": [[58587.373556232174, 0.023058099924416924], [218942.2520624449, 0.02077559468599007], [249121.18966905997, 0.01981708209173986], [541684.8312906369, 0.018923404637958878], [604071.0108265628, 0.017692116608665046], [653308.3941685917, 0.019251313129851393], [693745.8807889929, 0.017594974079191316], [741274.9924410149, 0.01903177037003353], [806158.1097071825, 0.018709431464131423], [1348259.6431546232, 0.018088844103971154]], "Colebrook (1939)||Tar-coated cast iron — Fig5 upper - branch 3": [[619638.9804735958, 0.0163149478279951], [801168.1920303109, 0.015808761896677948], [868386.0210801255, 0.01564525931715955], [1372368.0962020203, 0.015015973796926176]], "Colebrook (1939)||Wrought iron — Fig7 lower - branch 1": [[12948.685579187922, 0.04652992599263843], [15573.06807148861, 0.04779027328118402], [143348.9214316188, 0.03236015985621111], [222900.00275878477, 0.028652615017361105]], "Colebrook (1939)||Wrought iron — Fig7 lower - branch 2": [[7338.357226986958, 0.0357034207679827], [7452.130207250323, 0.03462156197191305], [9048.39858446854, 0.03488736953362399], [10220.339119128099, 0.03488736953362399], [17187.809504208915, 0.030751028673464104], [21544.026765032388, 0.032843140642058566], [193671.33795052685, 0.025547567858102662], [268089.7805907478, 0.02105090082908163], [303422.4065128907, 0.024414062499999997], [335379.5931833406, 0.024730098855358998], [341649.5485481323, 0.01985166978515821], [375408.7704342554, 0.01973741580778846], [428919.3501974497, 0.019290123456790122], [501938.4860248238, 0.020926155024698637], [567133.5336155152, 0.0222256123221951]], "Colebrook (1939)||Wrought iron — Fig7 upper - branch 2": [[13836.759147672052, 0.04074881370317503], [34045.097022634814, 0.038177557519849324], [35682.53655879361, 0.03475408457604129], [60046.681325515434, 0.03154020723222551], [70939.61699433092, 0.03064071117070482], [82604.90162019612, 0.03064071117070482], [132297.0035437015, 0.029779152635288592], [174163.5550492605, 0.02796868977813345], [222513.02358732853, 0.0287523629489603], [250979.37325503916, 0.02796868977813345]], "Colebrook (1939)||Wrought iron — Fig7 upper - branch 3": [[23209.416002468366, 0.035021422703276225], [23927.309072092423, 0.03397018306824232], [36774.1629162328, 0.03272138675001119], [171596.21303117473, 0.023281315435649895], [176091.66367443846, 0.024971170693137965], [189403.16754981512, 0.025133848899464607], [344118.1146503587, 0.019567875440759643], [431974.33132421214, 0.019018243509539883], [476050.05390035285, 0.02188962906505235], [505662.065298005, 0.02061909895215393]], "Olsson & Sunden||s — Smooth": [[3704.031733877134, 0.03552952514055835], [4231.613793450881, 0.03473645393728562], [4702.07071913775, 0.03434658168427669], [5253.901516034136, 0.033390937968456644], [5838.01303370628, 0.033390937968456644], [6309.57344480193, 0.03301616741072076]], "Olsson & Sunden||r1 — Rib-roughened r1": [[3724.6402948322557, 0.07697925732407247], [4754.5392146180675, 0.07697925732407247], [5283.133271435983, 0.07654604148317888], [5838.01303370628, 0.07568691010189738]], "Olsson & Sunden||r2 — Rib-roughened r2": [[3850.7220220436757, 0.08764885878870893], [4184.916017036823, 0.08666511248831482], [4861.239162480231, 0.0852101566823338], [5522.919010932676, 0.08425378169296484]], "Olsson & Sunden||d1 — Dimpled d1": [[3543.2156895591206, 0.10093011675509894], [4070.413726757579, 0.10036211276387472], [4522.948958381903, 0.09867720825646974], [5053.758186296548, 0.09702059035165703], [5584.547018776935, 0.09485494822646622], [6069.215106410441, 0.09432113343547839]], "Olsson & Sunden||d2 — Dimpled d2": [[3543.2156895591206, 0.14898358574960832], [3959.0443008956418, 0.1473114356118189], [4374.856934730913, 0.14160532958946317], [4861.239162480231, 0.13922802353713645], [5253.901516034136, 0.13844449057787872]], "Olsson & Sunden||d3 — Dimpled d3": [[3872.1467411643825, 0.08914545521509107], [4184.916017036823, 0.08814491153458291], [4861.239162480231, 0.08666511248831482], [5522.919010932676, 0.08473061984393054]], "Olsson & Sunden||d4 — Dimpled d4": [[3504.1146982744463, 0.10922813065227732], [3872.1467411643825, 0.1073943811964001], [4184.916017036823, 0.10559141718971847], [4861.239162480231, 0.10381872179833293], [5553.647530898101, 0.10265348947366618]], "Olsson & Sunden||d5 — Dimpled d5": [[3504.1146982744463, 0.10984631227934631], [3893.6906635375676, 0.10861342796333667], [4208.200130949875, 0.10618901666975229], [4888.28621574414, 0.10499718081775122], [5584.547018776935, 0.10323446161672296]], "Olsson & Sunden||osf1 — Offset strip fin osf1": [[4025.494866151959, 0.12227962803741513], [4676.054002526191, 0.1188773751092797], [5283.133271435983, 0.11556978492401315]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 58 (0.914 m)": [[125000.0, 0.0172], [160000.0, 0.0166], [210000.0, 0.0161], [280000.0, 0.0157], [360000.0, 0.0154], [460000.0, 0.0152], [580000.0, 0.0153], [720000.0, 0.0155], [900000.0, 0.0157], [1150000.0, 0.0158]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 59 (0.609 m)": [[500000.0, 0.0165], [630000.0, 0.0168], [780000.0, 0.017], [950000.0, 0.0171], [1150000.0, 0.0169], [1400000.0, 0.0167], [1750000.0, 0.0164], [2100000.0, 0.0162]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 2 (4.267 m)": [[4200000.0, 0.0108], [5000000.0, 0.0106], [5800000.0, 0.0105], [6700000.0, 0.0104], [7600000.0, 0.0104], [8600000.0, 0.0105], [9500000.0, 0.0106]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 46 (3.453 m)": [[2000000.0, 0.0128], [2600000.0, 0.0122], [3300000.0, 0.0117], [4100000.0, 0.0114], [5000000.0, 0.0112], [6000000.0, 0.0111]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 48 (1.219 m)": [[1000000.0, 0.0148], [1200000.0, 0.0145], [1450000.0, 0.0142], [1750000.0, 0.0139], [2100000.0, 0.0136], [2500000.0, 0.0133]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 49 (1.524 m)": [[580000.0, 0.0176], [700000.0, 0.017], [850000.0, 0.0166], [1000000.0, 0.0163], [1200000.0, 0.0161], [1450000.0, 0.0159]], "Yoo & Singh||Fig. 4d — Concrete — Concrete 50 (1.524 m)": [[600000.0, 0.0164], [750000.0, 0.0159], [900000.0, 0.0154], [1050000.0, 0.015], [1250000.0, 0.0147], [1500000.0, 0.0145]], "Yoo & Singh||Fig. 4e — Continuous-interior steel — Continuous 14 (0.793 m)": [[550000.0, 0.0132], [650000.0, 0.0128], [750000.0, 0.0126], [870000.0, 0.0123], [1000000.0, 0.0121], [1200000.0, 0.0118], [1450000.0, 0.0115]], "Yoo & Singh||Fig. 4e — Continuous-interior steel — Continuous 30 (1.051 m)": [[600000.0, 0.0138], [850000.0, 0.0137], [1100000.0, 0.0138], [1400000.0, 0.0139], [1800000.0, 0.014], [2400000.0, 0.0141], [3100000.0, 0.0142]], "Yoo & Singh||Fig. 4f — Girth-riveted steel — Girth riveted 1 (0.980 m)": [[2400000.0, 0.0168], [3000000.0, 0.0166], [3700000.0, 0.0165], [4600000.0, 0.0163], [5500000.0, 0.0162], [6500000.0, 0.0162], [7700000.0, 0.0163]], "Yoo & Singh||Fig. 4f — Girth-riveted steel — Girth riveted 26 (0.914 m)": [[280000.0, 0.0265], [340000.0, 0.026], [420000.0, 0.0268], [500000.0, 0.0285], [600000.0, 0.0305], [720000.0, 0.0288], [850000.0, 0.027], [1000000.0, 0.0262]], "Yoo & Singh||Fig. 4f — Girth-riveted steel — Girth riveted 6 (1.400 m)": [[1200000.0, 0.0187], [1700000.0, 0.0196], [2300000.0, 0.0188], [3000000.0, 0.0182], [3900000.0, 0.0184], [5000000.0, 0.0186], [6200000.0, 0.0181]], "Yoo & Singh||Fig. 4g — Full-riveted steel — Full riveted 40 (0.965 m)": [[190000.0, 0.0195], [220000.0, 0.0203], [250000.0, 0.021], [280000.0, 0.0222], [320000.0, 0.0214], [370000.0, 0.0202], [430000.0, 0.0197]], "Yoo & Singh||Fig. 4g — Full-riveted steel — Full riveted 1 (1.201 m)": [[350000.0, 0.02], [500000.0, 0.021], [700000.0, 0.0205], [950000.0, 0.02], [1300000.0, 0.0197], [1800000.0, 0.0195], [2500000.0, 0.0193], [3200000.0, 0.0191]], "Yoo & Singh||Fig. 4g — Full-riveted steel — Full riveted 37 (1.829 m)": [[800000.0, 0.012], [1000000.0, 0.013], [1250000.0, 0.014], [1550000.0, 0.015], [1900000.0, 0.016], [2400000.0, 0.0168], [3000000.0, 0.0173], [3800000.0, 0.0176], [4800000.0, 0.0178]], "Yoo & Singh||Fig. 4h — Plastic — 14 mm polyethylene": [[4000.0, 0.039], [5000.0, 0.0375], [6500.0, 0.0355], [8000.0, 0.034], [10000.0, 0.0325], [12500.0, 0.0308], [15500.0, 0.0295], [19000.0, 0.0283], [23000.0, 0.027]], "Yoo & Singh||Fig. 4h — Plastic — 16 mm PVC": [[3800.0, 0.045], [5000.0, 0.0415], [6500.0, 0.0385], [8500.0, 0.0358], [11000.0, 0.033], [14000.0, 0.0305], [18000.0, 0.0282], [23000.0, 0.0265], [30000.0, 0.0248], [38000.0, 0.0233]], "Yoo & Singh||Fig. 4h — Plastic — 26 mm PVC": [[5000.0, 0.041], [6500.0, 0.0385], [8500.0, 0.0358], [11000.0, 0.0335], [14000.0, 0.0315], [18000.0, 0.0295], [23000.0, 0.0278], [30000.0, 0.0258], [38000.0, 0.024], [48000.0, 0.0222], [60000.0, 0.0208]], "Taylor et al. (1988)||A1": [[11600.0, 0.08116], [13500.0, 0.08204], [13500.0, 0.08216], [15300.0, 0.08252], [17800.0, 0.08068], [18000.0, 0.08152], [20500.0, 0.08124], [23800.0, 0.07876], [23900.0, 0.07824], [32000.0, 0.0756], [32000.0, 0.07616], [37200.0, 0.07528], [42700.0, 0.07432], [43000.0, 0.07316], [49400.0, 0.07336], [56000.0, 0.07232], [56400.0, 0.07128], [75600.0, 0.07028], [76100.0, 0.07104], [96800.0, 0.07248], [99500.0, 0.07312], [108000.0, 0.07156], [119200.0, 0.06968], [120100.0, 0.0686], [126400.0, 0.06924], [133000.0, 0.0696], [135100.0, 0.06864], [139100.0, 0.06912], [144200.0, 0.0684], [144800.0, 0.06852], [147500.0, 0.069], [152300.0, 0.06816], [153400.0, 0.06808], [162600.0, 0.06852], [174800.0, 0.06844], [175100.0, 0.0684], [191700.0, 0.06864], [209500.0, 0.06892], [209900.0, 0.06748], [233700.0, 0.06812], [234700.0, 0.069], [254400.0, 0.06856], [274800.0, 0.07168], [279100.0, 0.06928], [279700.0, 0.0686], [320700.0, 0.06732], [321200.0, 0.06712], [322400.0, 0.06788], [353600.0, 0.06704], [374700.0, 0.0722], [381500.0, 0.06696], [416700.0, 0.0668], [440500.0, 0.06596], [480500.0, 0.06588]], "Taylor et al. (1988)||A2": [[11700.0, 0.0498], [13500.0, 0.05032], [15500.0, 0.0472], [17900.0, 0.04772], [20400.0, 0.046], [24000.0, 0.045], [27600.0, 0.04484], [31900.0, 0.04468], [37000.0, 0.04276], [42700.0, 0.04252], [49500.0, 0.04156], [56300.0, 0.04052], [74600.0, 0.0402], [85000.0, 0.0402], [91100.0, 0.04012], [99900.0, 0.03972], [115400.0, 0.03832], [133600.0, 0.03832], [145100.0, 0.03624], [147300.0, 0.03564], [164400.0, 0.03912], [174500.0, 0.03456], [191300.0, 0.03452], [209600.0, 0.03556], [220200.0, 0.03472], [233400.0, 0.03492], [255100.0, 0.03432], [260700.0, 0.03476], [299700.0, 0.03456], [319200.0, 0.0352], [322400.0, 0.03396], [352500.0, 0.03468], [375900.0, 0.03428], [379700.0, 0.03436], [411000.0, 0.03492], [413400.0, 0.03416], [432700.0, 0.03424], [472500.0, 0.035], [475000.0, 0.03456], [507700.0, 0.03408], [531400.0, 0.0348]], "Taylor et al. (1988)||A3": [[11100.0, 0.03824], [11600.0, 0.04312], [13200.0, 0.03832], [13200.0, 0.04088], [13400.0, 0.0458], [15700.0, 0.03492], [15800.0, 0.039], [18000.0, 0.03476], [18200.0, 0.03548], [20600.0, 0.03328], [20800.0, 0.034], [23900.0, 0.03288], [24000.0, 0.03292], [27200.0, 0.0322], [27600.0, 0.03124], [32100.0, 0.03108], [32200.0, 0.03176], [37000.0, 0.03108], [37000.0, 0.0298], [43000.0, 0.02904], [43200.0, 0.0298], [46800.0, 0.029], [49100.0, 0.02828], [58000.0, 0.02852], [58400.0, 0.0262], [64700.0, 0.02672], [65100.0, 0.02768], [75400.0, 0.0266], [75800.0, 0.02704], [85000.0, 0.02688], [86400.0, 0.02576], [95800.0, 0.02628], [99100.0, 0.02452], [115700.0, 0.02532], [117000.0, 0.0242], [118400.0, 0.0262], [134200.0, 0.02316], [134500.0, 0.0248], [134500.0, 0.02272], [134700.0, 0.02536], [158200.0, 0.02492], [159500.0, 0.023], [178300.0, 0.0254], [180000.0, 0.02252], [210200.0, 0.02132], [210400.0, 0.0254], [245700.0, 0.02532], [249500.0, 0.02056], [284200.0, 0.02528], [284400.0, 0.02012], [333500.0, 0.01988], [334800.0, 0.0252], [338100.0, 0.0252], [353000.0, 0.01988], [451800.0, 0.01976], [454500.0, 0.0254], [518300.0, 0.01728]], "Taylor et al. (1988)||A4": [[11507.380420258378, 0.0795626788922783], [13386.24666971673, 0.0787469454704974], [15408.236691147493, 0.07655662269678364], [17873.10472248371, 0.07613165052101598], [20454.470207609782, 0.07600576295850138], [23832.876942877876, 0.07434329018537318], [27502.02711274213, 0.0703603387991367], [31694.81603044185, 0.07407534040820293], [36437.86656904187, 0.06963371604494989], [42013.43931248609, 0.07222110600187552], [48269.25415271998, 0.06786002823614108], [55863.66333757561, 0.06860425780068492], [64327.99272608504, 0.06675628345518042], [74958.9560309428, 0.06927843469064875], [98702.7861043858, 0.07064141496661969], [115830.65958997916, 0.06342742682459299], [133456.94420031586, 0.06572979753185745], [154768.42140819077, 0.06419060899826372], [178769.78492288964, 0.0656457958913991], [242838.5589701138, 0.06652568679288956], [325872.00958460884, 0.06742244298154143], [378616.90410335996, 0.06553724722369594], [444426.5543439951, 0.06854235781822025], [518336.467565977, 0.06496297406109403]], "Taylor et al. (1988)||A5": [[11669.360558372455, 0.04775111599326463], [13498.767513669527, 0.04732913422634934], [15635.28789385461, 0.04723665770432453], [17929.842333014436, 0.04561979407401233], [20745.76297924155, 0.0456781700520556], [23994.17833286549, 0.04320494809957438], [27952.684932673965, 0.0430881052107949], [31917.10772431712, 0.04189907676430105], [37385.731479002396, 0.04126412169150781], [42816.55928592773, 0.04030390676060815], [49255.964040973515, 0.03946387882984021], [55909.08090943586, 0.03927729850057344], [65669.65064278978, 0.03825381202980761], [74958.9560309428, 0.037779102122561324], [117499.30400521966, 0.03588171801918693], [135941.7765475021, 0.035806221282148165], [156832.22146907815, 0.034041194246747675], [181492.55874910014, 0.03326656904113807], [213506.82617126984, 0.032970108555198024], [246577.2139220787, 0.03323155343943835], [287420.4381245104, 0.03320656486289036], [327198.8470700409, 0.03285127694015092], [390872.6598273283, 0.03296018952432991], [453806.3705522695, 0.03328659451919632], [529921.7740765268, 0.032888365738836085], [616544.8946342759, 0.03280682558750379]], "Taylor et al. (1988)||A6": [[11700.0, 0.0408], [13400.0, 0.03436], [15600.0, 0.03416], [18000.0, 0.03356], [20200.0, 0.0324], [23800.0, 0.03188], [27500.0, 0.03088], [31800.0, 0.0304], [37200.0, 0.02924], [42600.0, 0.02812], [48900.0, 0.02764], [55900.0, 0.02708], [65300.0, 0.02592], [74600.0, 0.0258], [85600.0, 0.02604], [99400.0, 0.02376], [116100.0, 0.02372], [116700.0, 0.02404], [133200.0, 0.0226], [134900.0, 0.02236], [155800.0, 0.02292], [160400.0, 0.0216], [196700.0, 0.02084], [201500.0, 0.0206], [210600.0, 0.02124], [245700.0, 0.01972], [283000.0, 0.02064], [330200.0, 0.01952], [386200.0, 0.02036], [402700.0, 0.01932], [521600.0, 0.02024]], "Taylor et al. (1988)||B1": [[11600.0, 0.05708], [13400.0, 0.06412], [15700.0, 0.06052], [18000.0, 0.06196], [20900.0, 0.06148], [23800.0, 0.06308], [28100.0, 0.06252], [31600.0, 0.06288], [37200.0, 0.06276], [42500.0, 0.0626], [49100.0, 0.06196], [56100.0, 0.0618], [65000.0, 0.06072], [74600.0, 0.06056], [85700.0, 0.063], [99600.0, 0.06116], [115700.0, 0.05956], [135000.0, 0.0568], [157500.0, 0.056], [179900.0, 0.05624], [209400.0, 0.05636], [245000.0, 0.05604], [288700.0, 0.05644], [329700.0, 0.05672], [331700.0, 0.05652], [385300.0, 0.05692], [387000.0, 0.05684], [451400.0, 0.05704], [523200.0, 0.05728]], "Taylor et al. (1988)||B2": [[11700.0, 0.04452], [13400.0, 0.03956], [15600.0, 0.03788], [17900.0, 0.03724], [20900.0, 0.03644], [23700.0, 0.03696], [27700.0, 0.03688], [31900.0, 0.03716], [37100.0, 0.0364], [42800.0, 0.03648], [49500.0, 0.03556], [55400.0, 0.0342], [64200.0, 0.03504], [75300.0, 0.035], [85200.0, 0.03392], [100300.0, 0.03444], [100700.0, 0.03352], [115100.0, 0.03292], [134200.0, 0.03288], [155600.0, 0.03064], [175500.0, 0.03036], [208700.0, 0.02948], [245900.0, 0.02968], [284600.0, 0.02924], [331300.0, 0.02956], [389000.0, 0.02848], [389400.0, 0.0286], [452100.0, 0.02928], [455000.0, 0.02888], [518600.0, 0.02856], [613000.0, 0.02892]], "Taylor et al. (1988)||B3": [[11300.0, 0.0374], [13400.0, 0.03604], [15400.0, 0.03272], [18000.0, 0.03088], [20700.0, 0.02836], [23800.0, 0.0294], [27700.0, 0.02736], [31700.0, 0.02904], [37100.0, 0.02648], [42800.0, 0.02664], [48900.0, 0.02572], [55700.0, 0.02604], [65000.0, 0.02464], [75100.0, 0.02476], [84500.0, 0.02376], [99000.0, 0.02464], [117000.0, 0.02236], [135200.0, 0.02292], [136800.0, 0.0222], [156300.0, 0.02108], [157100.0, 0.02152], [160100.0, 0.02212], [209400.0, 0.01988], [249700.0, 0.02044], [287600.0, 0.01852], [333700.0, 0.02008], [387000.0, 0.0184], [447600.0, 0.01964], [526400.0, 0.01784], [610000.0, 0.01748]], "Taylor et al. (1988)||Molded silicone reference": [[13500.0, 0.02932], [18000.0, 0.02888], [23900.0, 0.02668], [30010.0, 0.0228], [31900.0, 0.02468], [39900.0, 0.02324], [42800.0, 0.0222], [49600.0, 0.0228], [56100.0, 0.02208], [60000.0, 0.0222], [71200.0, 0.02108], [74900.0, 0.02056], [75500.0, 0.02116], [79500.0, 0.02092], [99600.0, 0.02], [99800.0, 0.01956], [134400.0, 0.01856], [179800.0, 0.0186], [246100.0, 0.01664], [331400.0, 0.01604], [447500.0, 0.01632], [603600.0, 0.01552]]};
+const DB = [{"status":"Calibrated","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — H.2 / S = 0.063 branch","n":12,"reMin":93698.0,"reMax":281859.0,"k":0.00965,"q":0.0114,"eps":0.00514,"mape2p":0.42,"mapeCb":0.64,"Dmm":50.8,"dimType":"D","Rmm":25.4,"ldmm":0.28956,"ltmm":0.24511,"ksCmm":0.26111199999999996,"dimStatus":"exact mapping"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — H.4 branch","n":6,"reMin":22002.0,"reMax":1045209.0,"k":0.00298,"q":1.01e-12,"eps":0.00106,"mape2p":5.26,"mapeCb":12.13,"Dmm":101.6,"dimType":"D","Rmm":50.8,"ldmm":5.130799999999999e-11,"ltmm":0.151384,"ksCmm":0.10769599999999999,"dimStatus":"exact mapping"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — S = 0.035","n":6,"reMin":17970.0,"reMax":30564.0,"k":0.0612,"q":3.81e-08,"eps":0.03,"mape2p":0.39,"mapeCb":0.65,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Indicative","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — S = 0.049","n":9,"reMin":15257.0,"reMax":49269.0,"k":0.0138,"q":0.00774,"eps":0.00618,"mape2p":1.62,"mapeCb":1.5,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — S = 0.085","n":12,"reMin":10967.0,"reMax":77656.0,"k":0.0107,"q":5.66e-12,"eps":0.00421,"mape2p":2.23,"mapeCb":6.15,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Galvanized iron","case":"Galvanized iron — S = 1.04","n":6,"reMin":13247.0,"reMax":37328.0,"k":0.011,"q":0.014,"eps":0.00951,"mape2p":5.21,"mapeCb":6.84,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 lower - branch 1","n":5,"reMin":33436.0,"reMax":482405.0,"k":0.00137,"q":0.00406,"eps":0.00088,"mape2p":2.38,"mapeCb":4.46,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 lower - branch 2","n":4,"reMin":462353.0,"reMax":1069426.0,"k":3.39e-06,"q":0.00679,"eps":0.00082,"mape2p":1.92,"mapeCb":3.44,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 lower - branch 3","n":6,"reMin":308967.0,"reMax":870637.0,"k":4.14e-09,"q":0.00383,"eps":0.00034,"mape2p":0.88,"mapeCb":2.78,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 upper - branch 1","n":4,"reMin":262841.0,"reMax":1078797.0,"k":0.00188,"q":0.00787,"eps":0.00135,"mape2p":1.0,"mapeCb":3.02,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Calibrated","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 upper - branch 2","n":10,"reMin":58587.0,"reMax":1348260.0,"k":0.00148,"q":0.00365,"eps":0.00071,"mape2p":3.17,"mapeCb":2.86,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Tar-coated cast iron","case":"Tar-coated cast iron — Fig5 upper - branch 3","n":4,"reMin":619639.0,"reMax":1372368.0,"k":0.00051,"q":0.00351,"eps":0.00029,"mape2p":0.1,"mapeCb":1.3,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Wrought iron","case":"Wrought iron — Fig7 lower - branch 1","n":4,"reMin":12949.0,"reMax":222900.0,"k":1.7e-11,"q":0.0152,"eps":0.00755,"mape2p":5.68,"mapeCb":16.14,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Wrought iron","case":"Wrought iron — Fig7 lower - branch 2","n":15,"reMin":7338.0,"reMax":567134.0,"k":0.00279,"q":0.00398,"eps":0.00141,"mape2p":7.04,"mapeCb":7.32,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Calibrated","source":"Colebrook (1939)","surfaceClass":"Wrought iron","case":"Wrought iron — Fig7 upper - branch 2","n":10,"reMin":13837.0,"reMax":250979.0,"k":0.00481,"q":0.0117,"eps":0.00473,"mape2p":2.33,"mapeCb":6.29,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Colebrook (1939)","surfaceClass":"Wrought iron","case":"Wrought iron — Fig7 upper - branch 3","n":10,"reMin":23209.0,"reMax":505662.0,"k":9.13e-07,"q":0.00755,"eps":0.0016,"mape2p":5.8,"mapeCb":11.66,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"original diameter not uniquely recoverable from current branch label"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Dimpled radiator passage","case":"d1 — Dimpled d1","n":6,"reMin":3543.0,"reMax":6069.0,"k":1e-06,"q":0.0611,"eps":0.0865,"mape2p":1.08,"mapeCb":1.76,"Dmm":3.53,"dimType":"Dh","Rmm":1.765,"ldmm":0.10784149999999999,"ltmm":1.7649999999999998e-06,"ksCmm":0.305345,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Dimpled radiator passage","case":"d2 — Dimpled d2","n":5,"reMin":3543.0,"reMax":5254.0,"k":1e-06,"q":0.1037,"eps":0.1706,"mape2p":2.15,"mapeCb":2.53,"Dmm":2.81,"dimType":"Dh","Rmm":1.405,"ldmm":0.1456985,"ltmm":1.4049999999999999e-06,"ksCmm":0.47938600000000003,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Dimpled radiator passage","case":"d3 — Dimpled d3","n":4,"reMin":3872.0,"reMax":5523.0,"k":1e-06,"q":0.0508,"eps":0.0679,"mape2p":0.56,"mapeCb":1.11,"Dmm":3.08,"dimType":"Dh","Rmm":1.54,"ldmm":0.078232,"ltmm":1.5399999999999999e-06,"ksCmm":0.209132,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Dimpled radiator passage","case":"d4 — Dimpled d4","n":5,"reMin":3504.0,"reMax":5554.0,"k":6.67e-08,"q":0.0681,"eps":0.1005,"mape2p":0.97,"mapeCb":1.49,"Dmm":3.08,"dimType":"Dh","Rmm":1.54,"ldmm":0.104874,"ltmm":1.02718e-07,"ksCmm":0.30954000000000004,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Dimpled radiator passage","case":"d5 — Dimpled d5","n":5,"reMin":3504.0,"reMax":5585.0,"k":4.7e-07,"q":0.069,"eps":0.1021,"mape2p":1.01,"mapeCb":1.53,"Dmm":3.08,"dimType":"Dh","Rmm":1.54,"ldmm":0.10626000000000001,"ltmm":7.238000000000001e-07,"ksCmm":0.31446799999999997,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Offset-strip-fin passage","case":"osf1 — Offset strip fin osf1","n":3,"reMin":4025.0,"reMax":5283.0,"k":1e-06,"q":0.0812,"eps":0.1254,"mape2p":1.33,"mapeCb":1.66,"Dmm":2.82,"dimType":"Dh","Rmm":1.41,"ldmm":0.11449199999999998,"ltmm":1.4099999999999998e-06,"ksCmm":0.353628,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Rib-roughened radiator passage","case":"r1 — Rib-roughened r1","n":4,"reMin":3725.0,"reMax":5838.0,"k":0.1109,"q":0.0332,"eps":0.0507,"mape2p":0.43,"mapeCb":0.55,"Dmm":3.11,"dimType":"Dh","Rmm":1.555,"ldmm":0.051626,"ltmm":0.17244949999999998,"ksCmm":0.157677,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Rib-roughened radiator passage","case":"r2 — Rib-roughened r2","n":4,"reMin":3851.0,"reMax":5523.0,"k":7.02e-05,"q":0.0496,"eps":0.0659,"mape2p":0.24,"mapeCb":0.81,"Dmm":3.05,"dimType":"Dh","Rmm":1.525,"ldmm":0.07564,"ltmm":0.000107055,"ksCmm":0.20099499999999998,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Olsson & Sunden","surfaceClass":"Smooth radiator passage","case":"s — Smooth","n":6,"reMin":3704.0,"reMax":6310.0,"k":0.00719,"q":1.01e-12,"eps":1e-12,"mape2p":1.68,"mapeCb":10.38,"Dmm":3.11,"dimType":"Dh","Rmm":1.555,"ldmm":1.5705499999999998e-12,"ltmm":0.01118045,"ksCmm":3.11e-12,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Large hemispheres","case":"A1","n":54,"reMin":11600.0,"reMax":480500.0,"k":0.0447,"q":0.0502,"eps":0.0492,"mape2p":1.51,"mapeCb":4.8,"Dmm":51.46,"dimType":"D","Rmm":25.73,"ldmm":1.291646,"ltmm":1.150131,"ksCmm":2.531832,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Large hemispheres","case":"A2","n":41,"reMin":11700.0,"reMax":531400.0,"k":0.00741,"q":0.0195,"eps":0.00939,"mape2p":1.94,"mapeCb":8.33,"Dmm":51.46,"dimType":"D","Rmm":25.73,"ldmm":0.501735,"ltmm":0.1906593,"ksCmm":0.48320940000000007,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Taylor et al. (1988)","surfaceClass":"Large hemispheres","case":"A3","n":57,"reMin":11100.0,"reMax":518300.0,"k":1.19e-06,"q":0.00762,"eps":0.00219,"mape2p":5.3,"mapeCb":9.7,"Dmm":51.51,"dimType":"D","Rmm":25.755,"ldmm":0.19625309999999999,"ltmm":3.064845e-05,"ksCmm":0.1128069,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Cones","case":"A4","n":24,"reMin":11507.0,"reMax":518336.0,"k":0.0684,"q":0.0457,"eps":0.0466,"mape2p":2.49,"mapeCb":4.92,"Dmm":51.31,"dimType":"D","Rmm":25.655,"ldmm":1.1724335,"ltmm":1.7548020000000002,"ksCmm":2.3910460000000002,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Cones","case":"A5","n":26,"reMin":11669.0,"reMax":616545.0,"k":0.00828,"q":0.0176,"eps":0.00889,"mape2p":1.42,"mapeCb":9.08,"Dmm":51.41,"dimType":"D","Rmm":25.705,"ldmm":0.452408,"ltmm":0.21283739999999995,"ksCmm":0.45703489999999997,"dimStatus":"exact/tabulated"},{"status":"Research-only","source":"Taylor et al. (1988)","surfaceClass":"Cones","case":"A6","n":31,"reMin":11700.0,"reMax":521600.0,"k":5.82e-07,"q":0.00597,"eps":0.00141,"mape2p":2.66,"mapeCb":8.62,"Dmm":51.46,"dimType":"D","Rmm":25.73,"ldmm":0.1536081,"ltmm":1.497486e-05,"ksCmm":0.0725586,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Small hemispheres","case":"B1","n":29,"reMin":11600.0,"reMax":523200.0,"k":0.0578,"q":0.0326,"eps":0.0321,"mape2p":3.07,"mapeCb":3.92,"Dmm":51.89,"dimType":"D","Rmm":25.945,"ldmm":0.845807,"ltmm":1.4996209999999999,"ksCmm":1.6656689999999998,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Small hemispheres","case":"B2","n":31,"reMin":11700.0,"reMax":613000.0,"k":0.00727,"q":0.013,"eps":0.00559,"mape2p":3.07,"mapeCb":6.93,"Dmm":51.51,"dimType":"D","Rmm":25.755,"ldmm":0.334815,"ltmm":0.18723885,"ksCmm":0.2879409,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Small hemispheres","case":"B3","n":30,"reMin":11300.0,"reMax":610000.0,"k":0.00071,"q":0.00493,"eps":0.00104,"mape2p":3.13,"mapeCb":7.01,"Dmm":51.64,"dimType":"D","Rmm":25.82,"ldmm":0.1272926,"ltmm":0.0183322,"ksCmm":0.0537056,"dimStatus":"exact/tabulated"},{"status":"Calibrated","source":"Taylor et al. (1988)","surfaceClass":"Molded silicone","case":"Molded silicone reference","n":22,"reMin":13500.0,"reMax":603600.0,"k":0.00078,"q":0.00144,"eps":0.0003,"mape2p":2.25,"mapeCb":2.95,"Dmm":null,"dimType":"D","Rmm":null,"ldmm":null,"ltmm":null,"ksCmm":null,"dimStatus":"not listed in retained table"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 2 (4.267 m)","n":7,"reMin":4200000.0,"reMax":9500000.0,"k":0.00018,"q":0.00068,"eps":3.59e-05,"mape2p":0.79,"mapeCb":0.93,"Dmm":4267,"dimType":"D","Rmm":2133.5,"ldmm":1.4507800000000002,"ltmm":0.38403000000000004,"ksCmm":0.1531853,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 46 (3.453 m)","n":6,"reMin":2000000.0,"reMax":6000000.0,"k":9.17e-05,"q":0.00235,"eps":6.24e-05,"mape2p":0.8,"mapeCb":2.52,"Dmm":3453,"dimType":"D","Rmm":1726.5,"ldmm":4.057275,"ltmm":0.15832005000000002,"ksCmm":0.2154672,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 48 (1.219 m)","n":6,"reMin":1000000.0,"reMax":2500000.0,"k":0.00026,"q":0.00322,"eps":0.00017,"mape2p":0.19,"mapeCb":1.94,"Dmm":1219,"dimType":"D","Rmm":609.5,"ldmm":1.96259,"ltmm":0.15847,"ksCmm":0.20723000000000003,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 49 (1.524 m)","n":6,"reMin":580000.0,"reMax":1450000.0,"k":0.00057,"q":0.00452,"eps":0.0004,"mape2p":0.46,"mapeCb":1.91,"Dmm":1524,"dimType":"D","Rmm":762.0,"ldmm":3.4442399999999997,"ltmm":0.43434,"ksCmm":0.6096,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 50 (1.524 m)","n":6,"reMin":600000.0,"reMax":1500000.0,"k":2.82e-08,"q":0.00363,"eps":0.00025,"mape2p":0.51,"mapeCb":2.47,"Dmm":1524,"dimType":"D","Rmm":762.0,"ldmm":2.76606,"ltmm":2.1488400000000002e-05,"ksCmm":0.381,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 58 (0.914 m)","n":10,"reMin":125000.0,"reMax":1150000.0,"k":0.00076,"q":1e-12,"eps":0.00021,"mape2p":1.35,"mapeCb":4.58,"Dmm":914,"dimType":"D","Rmm":457.0,"ldmm":4.5699999999999997e-10,"ltmm":0.34732,"ksCmm":0.19194,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Concrete","case":"Fig. 4d — Concrete — Concrete 59 (0.609 m)","n":8,"reMin":500000.0,"reMax":2100000.0,"k":0.00104,"q":0.00102,"eps":0.00043,"mape2p":1.52,"mapeCb":1.59,"Dmm":609,"dimType":"D","Rmm":304.5,"ldmm":0.31059000000000003,"ltmm":0.31667999999999996,"ksCmm":0.26187,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Continuous-interior steel","case":"Fig. 4e — Continuous-interior steel — Continuous 14 (0.793 m)","n":7,"reMin":550000.0,"reMax":1450000.0,"k":0.00019,"q":0.00043,"eps":1.97e-05,"mape2p":0.18,"mapeCb":0.25,"Dmm":793,"dimType":"D","Rmm":396.5,"ldmm":0.170495,"ltmm":0.075335,"ksCmm":0.015622100000000002,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Continuous-interior steel","case":"Fig. 4e — Continuous-interior steel — Continuous 30 (1.051 m)","n":7,"reMin":600000.0,"reMax":3100000.0,"k":0.00052,"q":1.35e-12,"eps":0.00016,"mape2p":1.51,"mapeCb":3.52,"Dmm":1051,"dimType":"D","Rmm":525.5,"ldmm":7.09425e-10,"ltmm":0.27326,"ksCmm":0.16816,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Girth-riveted steel","case":"Fig. 4f — Girth-riveted steel — Girth riveted 1 (0.980 m)","n":7,"reMin":2400000.0,"reMax":7700000.0,"k":0.00088,"q":0.00565,"eps":0.00044,"mape2p":0.32,"mapeCb":0.85,"Dmm":980,"dimType":"D","Rmm":490.0,"ldmm":2.7685,"ltmm":0.4312,"ksCmm":0.4312,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Girth-riveted steel","case":"Fig. 4f — Girth-riveted steel — Girth riveted 26 (0.914 m)","n":8,"reMin":280000.0,"reMax":1000000.0,"k":0.00686,"q":1.14e-10,"eps":0.00346,"mape2p":4.6,"mapeCb":4.72,"Dmm":914,"dimType":"D","Rmm":457.0,"ldmm":5.2097999999999994e-08,"ltmm":3.13502,"ksCmm":3.16244,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Girth-riveted steel","case":"Fig. 4f — Girth-riveted steel — Girth riveted 6 (1.400 m)","n":7,"reMin":1200000.0,"reMax":6200000.0,"k":0.00143,"q":0.00673,"eps":0.00077,"mape2p":1.64,"mapeCb":1.67,"Dmm":1400,"dimType":"D","Rmm":700.0,"ldmm":4.711,"ltmm":1.0010000000000001,"ksCmm":1.0779999999999998,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Full-riveted steel","case":"Fig. 4g — Full-riveted steel — Full riveted 1 (1.201 m)","n":8,"reMin":350000.0,"reMax":3200000.0,"k":0.00183,"q":0.00585,"eps":0.00097,"mape2p":1.74,"mapeCb":1.89,"Dmm":1201,"dimType":"D","Rmm":600.5,"ldmm":3.512925,"ltmm":1.098915,"ksCmm":1.16497,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Full-riveted steel","case":"Fig. 4g — Full-riveted steel — Full riveted 37 (1.829 m)","n":9,"reMin":800000.0,"reMax":4800000.0,"k":0.00077,"q":1.34e-12,"eps":0.00031,"mape2p":12.15,"mapeCb":13.38,"Dmm":1829,"dimType":"D","Rmm":914.5,"ldmm":1.22543e-09,"ltmm":0.7041649999999999,"ksCmm":0.56699,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"Full-riveted steel","case":"Fig. 4g — Full-riveted steel — Full riveted 40 (0.965 m)","n":7,"reMin":190000.0,"reMax":430000.0,"k":0.00233,"q":2.46e-12,"eps":0.00098,"mape2p":3.8,"mapeCb":3.87,"Dmm":965,"dimType":"D","Rmm":482.5,"ldmm":1.18695e-09,"ltmm":1.124225,"ksCmm":0.9457,"dimStatus":"exact in dataset label"},{"status":"Indicative","source":"Yoo & Singh","surfaceClass":"Polyethylene","case":"Fig. 4h — Plastic — 14 mm polyethylene","n":9,"reMin":4000.0,"reMax":23000.0,"k":0.00499,"q":0.0009,"eps":0.00089,"mape2p":0.92,"mapeCb":1.26,"Dmm":14,"dimType":"D","Rmm":7.0,"ldmm":0.0063,"ltmm":0.034929999999999996,"ksCmm":0.012459999999999999,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"PVC","case":"Fig. 4h — Plastic — 16 mm PVC","n":10,"reMin":3800.0,"reMax":38000.0,"k":3.94e-10,"q":0.00209,"eps":0.00094,"mape2p":4.06,"mapeCb":4.82,"Dmm":16,"dimType":"D","Rmm":8.0,"ldmm":0.01672,"ltmm":3.152e-09,"ksCmm":0.01504,"dimStatus":"exact in dataset label"},{"status":"Research-only","source":"Yoo & Singh","surfaceClass":"PVC","case":"Fig. 4h — Plastic — 26 mm PVC","n":11,"reMin":5000.0,"reMax":60000.0,"k":3.94e-10,"q":0.00209,"eps":0.00078,"mape2p":3.37,"mapeCb":5.48,"Dmm":26,"dimType":"D","Rmm":13.0,"ldmm":0.02717,"ltmm":5.1219999999999995e-09,"ksCmm":0.02028,"dimStatus":"exact in dataset label"}];
+
+const CBL=0.310, CE=0.09435;
+let fitPoints=[];
+let presetPoints=[];
+
+function fr(k){
+ k=Math.max(0,+k);
+ if(k===0) return 0;
+ return (0.21440581 - 0.67056894*Math.cbrt(k) + 1.89864110*Math.pow(k,2/3) - 1.57912290*k)*Math.cbrt(k);
+}
+function f2p(Re,k,q){
+ Re=+Re;k=Math.max(0,+k);q=Math.max(0,+q);
+ const a=CBL/Math.pow(Re,.25)+q, b=CE/Math.pow(Re,2/13)+q, c=fr(k);
+ return Math.pow(Math.pow(a,12)+Math.pow(b,12)+Math.pow(c,12),1/12);
+}
+function colebrookIter(Re,eps,tol=1e-12){
+ Re=+Re;eps=Math.max(0,+eps);
+ let f=.02;
+ for(let i=0;i<100;i++){
+   const rhs=-2*Math.log10(eps/3.7+2.51/(Re*Math.sqrt(f)));
+   const fn=1/(rhs*rhs);
+   if(Math.abs(fn-f)<tol) return {f:fn,it:i+1};
+   f=fn;
+ }
+ return {f:f,it:100};
+}
+function colebrook(Re,eps,tol=1e-12){
+ return colebrookIter(Re,eps,tol).f;
+}
+const $=id=>document.getElementById(id);
+const fmt=x=>Number.isFinite(x)?(Math.abs(x)<.001||Math.abs(x)>=10000?x.toExponential(4):x.toFixed(6)):"—";
+
+function calculate(){
+ const Re=+$("Re").value,k=+$("k").value,q=+$("q").value;
+ if(!(Re>0)||k<0||q<0){$("f2pResult").textContent="Invalid input";return;}
+ const f=f2p(Re,k,q);
+ $("f2pResult").textContent=fmt(f);
+ $("calcNote").textContent=`Re = ${Re.toLocaleString()} · k = ${k} · q = ${q}`;
+ $("ReCB").value=Re;
+ drawPlot();
+ if(typeof syncNomogramToQuick==="function") syncNomogramToQuick();
+}
+function compareColebrook(){
+ const Re=+$("ReCB").value,eps=+$("eps").value,tol=+$("tol").value||1e-12;
+ $("Re").value=Re;
+ const a=f2p(Re,+$("k").value,+$("q").value),b=colebrook(Re,eps,tol);
+ $("m2p").textContent=fmt(a); $("mcb").textContent=fmt(b);
+ $("mdiff").textContent=((a-b)/b*100).toFixed(2)+"%";
+ drawPlot();
+}
+function resetDefaults(){
+ $("Re").value=100000;$("ReCB").value=100000;$("k").value=.001;$("q").value=.001;$("eps").value=.001;
+ $("preset").value="";presetPoints=[];fitPoints=[];updateDataLegend();
+ calculate(); compareColebrook();
+}
+function runBenchmark(){
+ const N=Math.max(1000,Math.min(2000000,Math.floor(+$("benchN").value||100000)));
+ let r0=+$("benchReMin").value,r1=+$("benchReMax").value;
+ if(!(r0>0&&r1>r0)){r0=4000;r1=1e7;}
+ const k=Math.max(0,+$("k").value),q=Math.max(0,+$("q").value),eps=Math.max(0,+$("eps").value);
+ const tol=+$("tol").value||1e-12;
+ const log0=Math.log(r0),log1=Math.log(r1),den=Math.max(1,N-1);
+
+ // Warm-up to reduce first-call/JIT effects.
+ for(let i=0;i<2000;i++){
+   const r=Math.exp(log0+(log1-log0)*(i%2000)/1999);
+   f2p(r,k,q); colebrook(r,eps,tol);
+ }
+
+ let sink=0;
+ let t0=performance.now();
+ for(let i=0;i<N;i++){
+   const r=Math.exp(log0+(log1-log0)*i/den);
+   sink+=f2p(r,k,q);
+ }
+ let t1=performance.now();
+
+ let totalIt=0;
+ let t2=performance.now();
+ for(let i=0;i<N;i++){
+   const r=Math.exp(log0+(log1-log0)*i/den);
+   const res=colebrookIter(r,eps,tol);
+   sink+=res.f; totalIt+=res.it;
+ }
+ let t3=performance.now();
+
+ const t2p=t1-t0, tcb=t3-t2, ratio=tcb/Math.max(t2p,1e-12), avgIt=totalIt/N;
+ $("bench2p").textContent=t2p.toFixed(1)+" ms";
+ $("benchCb").textContent=tcb.toFixed(1)+" ms";
+ $("benchRatio").textContent=ratio.toFixed(2)+"×";
+ $("benchIter").textContent=avgIt.toFixed(1)+" avg.";
+ $("benchNote").textContent=`${N.toLocaleString()} evaluations over Re=${r0.toLocaleString()}–${r1.toLocaleString()}. Colebrook tolerance=${tol}. Browser benchmark only; do not treat ${ratio.toFixed(2)}× as a universal speedup factor.`;
+ window.__benchSink=sink; // prevent overly aggressive optimization
+ bumpLocalCalculation();
+}
+
+function pressureDrop(){
+ const rho=+$("rho").value,U=+$("U").value,D=+$("D").value,L=+$("L").value,mu=+$("mu").value;
+ if(!(rho>0&&U>0&&D>0&&L>0&&mu>0)) return;
+ const Re=rho*U*D/mu, f=f2p(Re,+$("k").value,+$("q").value),dp=f*(L/D)*(rho*U*U/2);
+ $("dp").textContent=dp>=1e6?(dp/1e6).toFixed(3)+" MPa":dp>=1000?(dp/1000).toFixed(3)+" kPa":dp.toFixed(2)+" Pa";
+ $("dpmeta").textContent=`Re = ${Re.toLocaleString(undefined,{maximumFractionDigits:0})}; f₂P = ${fmt(f)}`;
+}
+
+const BOTROS = {"status": "Independent validation", "source": "Botros", "surfaceClass": "Commercial steel pipe", "case": "Pipe #1", "n": 20, "reMin": 7621000.0, "reMax": 12440000.0, "k": 0.00014815895, "q": 0.00092497993, "eps": 2.6832564e-05, "epsReported": 2.6402016e-05, "mape2p": 0.0273168649, "mapeCb": 0.1903198167, "note": "Independent high-Re validation. k and q have limited individual identifiability because the measured Reynolds-number interval is narrow."};
+const BOTROS_POINTS = [[7656000.0, 0.01007], [7656000.0, 0.01007], [7654000.0, 0.01007], [7652000.0, 0.01007], [7651000.0, 0.01006], [12440000.0, 0.0099], [12430000.0, 0.00989], [12420000.0, 0.0099], [12420000.0, 0.0099], [12410000.0, 0.0099], [10560000.0, 0.00994], [10560000.0, 0.00995], [10560000.0, 0.00995], [10560000.0, 0.00994], [10560000.0, 0.00995], [7626000.0, 0.01007], [7622000.0, 0.01007], [7622000.0, 0.01007], [7621000.0, 0.01007], [7621000.0, 0.01007]];
+
+function makePresets(){
+ const sel=$("preset");
+ const coreGroup=document.createElement("optgroup");coreGroup.label="Core validation database — 53 datasets / 649 measurements";
+ DB.filter(x=>x.status!=="Research-only").forEach((r,i)=>{
+   const o=document.createElement("option");
+   o.value="core:"+DB.indexOf(r);
+   o.textContent=`${r.status} · ${r.surfaceClass} · ${r.case}`;
+   coreGroup.appendChild(o);
+ });
+ sel.appendChild(coreGroup);
+ const extraGroup=document.createElement("optgroup");extraGroup.label="Additional independent validation";
+ const bo=document.createElement("option");
+ bo.value="botros:0";
+ bo.textContent="Botros · Pipe #1 · high-Re independent validation";
+ extraGroup.appendChild(bo);
+ sel.appendChild(extraGroup);
+}
+function loadPreset(){
+ const val=$("preset").value;if(val===""){return;}
+ if(val.startsWith("core:")){
+   const idx=+val.split(":")[1],r=DB[idx];
+   $("k").value=r.k;$("q").value=r.q;$("eps").value=r.eps;
+   $("reMinPlot").value=Math.max(3500,r.reMin);$("reMaxPlot").value=r.reMax;
+   $("presetInfo").innerHTML=`<span class="status ${r.status}">${r.status}</span> <b>Core database.</b> ${r.source}; N=${r.n}; tested Re ${r.reMin.toLocaleString()}–${r.reMax.toLocaleString()}; 2P MAPE ${r.mape2p.toFixed(2)}%.`;
+   const key=r.source+"||"+r.case;
+   presetPoints=(EXP_DB[key]||[]).map(p=>[p[0],p[1]]);
+ } else {
+   const r=BOTROS;
+   $("k").value=r.k;$("q").value=r.q;$("eps").value=r.eps;
+   $("reMinPlot").value=2e5;$("reMaxPlot").value=5e7;
+   presetPoints=BOTROS_POINTS.map(p=>[p[0],p[1]]);
+   $("presetInfo").innerHTML=`<span class="status Independent-validation">Independent validation</span> <b>Botros, Pipe #1.</b> N=${r.n}; measured Re ${r.reMin.toLocaleString()}–${r.reMax.toLocaleString()}; fitted k=${fmt(r.k)}, q=${fmt(r.q)}; 2P MAPE=${r.mape2p.toFixed(3)}%; globally fitted Colebrook ε/D=${fmt(r.eps)} (Botros-reported ε/D=${fmt(r.epsReported)}). <b>Identification caution:</b> ${r.note}`;
+ }
+ fitPoints=[];
+ updateDataLegend();
+ calculate(); compareColebrook(); drawPlot();
+}
+
+function logspace(a,b,n){const A=Math.log10(a),B=Math.log10(b),arr=[];for(let i=0;i<n;i++)arr.push(Math.pow(10,A+(B-A)*i/(n-1)));return arr;}
+function updateDataLegend(){
+ const hasPreset=presetPoints.length>0,hasFit=fitPoints.length>0;
+ $("dataLegend").style.display=(hasPreset||hasFit)?"inline":"none";
+ $("dataLegendText").textContent=hasFit?"User experimental data":"Experimental data";
+}
+function drawPlot(){
+ const canvas=$("plot"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+ let r0=+$("reMinPlot").value,r1=+$("reMaxPlot").value;if(!(r0>0&&r1>r0)){r0=4000;r1=1e7;}
+ const k=+$("k").value,q=+$("q").value,eps=+$("eps").value,show=$("showCB").value==="yes";
+ const rs=logspace(r0,r1,260), ys=rs.map(r=>f2p(r,k,q)), ycb=show?rs.map(r=>colebrook(r,eps)):[];
+
+ let dataPoints=fitPoints.length?fitPoints:presetPoints;
+ let yall=ys.concat(ycb);
+ dataPoints.filter(p=>p[0]>=r0&&p[0]<=r1).forEach(p=>yall.push(p[1]));
+ let ymin=Math.min(...yall),ymax=Math.max(...yall); let pad=(ymax-ymin)*.16||ymax*.08;
+ ymin=Math.max(0,ymin-pad);ymax+=pad;
+ const L=112,R=18,T=20,B=52,pw=W-L-R,ph=H-T-B;
+ const X=r=>L+(Math.log10(r)-Math.log10(r0))/(Math.log10(r1)-Math.log10(r0))*pw;
+ const Y=y=>T+(ymax-y)/(ymax-ymin)*ph;
+
+ ctx.strokeStyle="#d8e1e8";ctx.lineWidth=1;ctx.fillStyle="#607080";ctx.font="12px system-ui";
+ // Adaptive logarithmic x-axis ticks.
+ const log0=Math.log10(r0),log1=Math.log10(r1),decades=log1-log0;
+ const tickCandidates=[];
+ const d0=Math.floor(log0),d1=Math.ceil(log1);
+ for(let p=d0;p<=d1;p++){
+   const major=Math.pow(10,p);
+   if(major>=r0&&major<=r1)tickCandidates.push({v:major,label:"10"+sup(p),major:true});
+   if(decades<=4.2){
+     for(const m of [2,5]){
+       const v=m*Math.pow(10,p);
+       if(v>=r0&&v<=r1)tickCandidates.push({v:v,label:(m===2?"2×10":"5×10")+sup(p),major:false});
+     }
+   }
+ }
+ if(tickCandidates.length<5){
+   const n=6;
+   for(let i=0;i<n;i++){
+     const lv=log0+(log1-log0)*i/(n-1);
+     const v=Math.pow(10,lv);
+     tickCandidates.push({v:v,label:formatReTick(v),major:(i===0||i===n-1)});
+   }
+ }
+ tickCandidates.sort((a,b)=>a.v-b.v);
+ const ticks=[];
+ let lastX=-1e9;
+ for(const t of tickCandidates){
+   const x=X(t.v);
+   if(ticks.length && Math.abs(Math.log10(t.v)-Math.log10(ticks[ticks.length-1].v))<0.025)continue;
+   if(x-lastX<62 && !t.major)continue;
+   ticks.push(t);lastX=x;
+ }
+ ctx.font="12px system-ui";
+ for(const t of ticks){
+   const x=X(t.v);
+   ctx.strokeStyle=t.major?"#cbd7df":"#e5ebef";
+   ctx.lineWidth=t.major?1:0.8;
+   ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+ph);ctx.stroke();
+   ctx.fillStyle="#607080";ctx.textAlign="center";
+   ctx.fillText(t.label,x,H-20);
+ }
+ ctx.textAlign="left";
+ for(let i=0;i<=5;i++){const y=ymin+(ymax-ymin)*i/5,py=Y(y);ctx.strokeStyle="#d8e1e8";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,py);ctx.lineTo(L+pw,py);ctx.stroke();ctx.fillStyle="#607080";ctx.textAlign="right";ctx.fillText(y.toFixed(4),L-12,py+4);ctx.textAlign="left";}
+ ctx.strokeStyle="#6b7b88";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+ph);ctx.lineTo(L+pw,T+ph);ctx.stroke();
+
+ line(rs,ys,"#1f5f8b",2.8);
+ if(show) line(rs,ycb,"#9a6700",2.2);
+ dataPoints.forEach(p=>{if(p[0]>=r0&&p[0]<=r1){ctx.fillStyle="#b42318";ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),4.5,0,Math.PI*2);ctx.fill();}});
+ updateDataLegend();
+ ctx.fillStyle="#425466";ctx.fillText("Reynolds number, Re",W/2-60,H-4);
+ ctx.save();ctx.translate(22,H/2+58);ctx.rotate(-Math.PI/2);ctx.font="13px system-ui";ctx.fillStyle="#425466";ctx.fillText("Darcy friction factor, f",0,0);ctx.restore();
+
+ function line(xs,vals,color,w){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.beginPath();xs.forEach((r,i)=>{const x=X(r),y=Y(vals[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();}
+ function sup(n){return String(n).replace(/-/g,"⁻").replace(/0/g,"⁰").replace(/1/g,"¹").replace(/2/g,"²").replace(/3/g,"³").replace(/4/g,"⁴").replace(/5/g,"⁵").replace(/6/g,"⁶").replace(/7/g,"⁷").replace(/8/g,"⁸").replace(/9/g,"⁹");}
+ function formatReTick(v){
+   if(v>=1000){
+     const p=Math.floor(Math.log10(v)),m=v/Math.pow(10,p);
+     if(Math.abs(m-1)<0.08)return "10"+sup(p);
+     return m.toFixed(m<3?1:0)+"×10"+sup(p);
+   }
+   return Math.round(v).toString();
+ }
+}
+
+function parseData(){
+ const lines=$("fitData").value.split(/\n/),a=[];
+ lines.forEach(line=>{const p=line.trim().split(/[\s,;\t]+/).map(Number);if(p.length>=2&&p[0]>0&&p[1]>0)a.push([p[0],p[1]])});
+ return a.sort((x,y)=>x[0]-y[0]);
+}
+function obj2p(data,k,q){let s=0;for(const [r,f] of data){const d=Math.log(f2p(r,k,q))-Math.log(f);s+=d*d}return s;}
+function fit2P(data){
+ // Coarse-to-fine deterministic search in log10(k), log10(q).
+ let lk0=-8,lk1=Math.log10(1/15),lq0=-8,lq1=-.7,best={s:Infinity,lk:-3,lq:-3};
+ for(let stage=0;stage<4;stage++){
+  const N=40;
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+   const lk=lk0+(lk1-lk0)*i/(N-1),lq=lq0+(lq1-lq0)*j/(N-1),k=Math.pow(10,lk),q=Math.pow(10,lq),s=obj2p(data,k,q);
+   if(s<best.s)best={s,lk,lq};
+  }
+  const dk=(lk1-lk0)/7,dq=(lq1-lq0)/7;
+  lk0=Math.max(-10,best.lk-dk);lk1=Math.min(Math.log10(1/15),best.lk+dk);
+  lq0=Math.max(-10,best.lq-dq);lq1=Math.min(-.3,best.lq+dq);
+ }
+ return {k:Math.pow(10,best.lk),q:Math.pow(10,best.lq),s:best.s};
+}
+function objCB(data,le){const e=Math.pow(10,le);let s=0;for(const [r,f] of data){const d=Math.log(colebrook(r,e))-Math.log(f);s+=d*d}return s;}
+function fitCB(data){
+ let a=-10,b=-.5,gr=(Math.sqrt(5)-1)/2,c=b-gr*(b-a),d=a+gr*(b-a),fc=objCB(data,c),fd=objCB(data,d);
+ for(let i=0;i<80;i++){if(fc<fd){b=d;d=c;fd=fc;c=b-gr*(b-a);fc=objCB(data,c)}else{a=c;c=d;fc=fd;d=a+gr*(b-a);fd=objCB(data,d)}}
+ return Math.pow(10,(a+b)/2);
+}
+function mape(data,fn){return data.reduce((s,p)=>s+Math.abs(fn(p[0])-p[1])/p[1],0)/data.length*100;}
+function fitData(){
+ const data=parseData();if(data.length<3){alert("Please provide at least three valid Re, f pairs.");return;}
+ const a=fit2P(data),eps=fitCB(data),m2=mape(data,r=>f2p(r,a.k,a.q)),mc=mape(data,r=>colebrook(r,eps));
+ presetPoints=[];fitPoints=data;updateDataLegend();$("fitK").textContent=fmt(a.k);$("fitQ").textContent=fmt(a.q);$("fitEps").textContent=fmt(eps);
+ $("fitM2").textContent=m2.toFixed(2)+"%";$("fitMC").textContent=mc.toFixed(2)+"%";
+ let flags=[];if(a.k<1e-5)flags.push("k near lower bound");if(a.q<1e-5)flags.push("q near lower bound");
+ const span=Math.max(...data.map(x=>x[0]))/Math.min(...data.map(x=>x[0]));
+ if(span<3)flags.push("narrow Re span");
+ if(data.length<10)flags.push("fewer than 10 points");
+ $("fitStatus").textContent=flags.length?"limited":"good";
+ $("fitWarning").style.display=flags.length?"block":"none";
+ $("fitWarning").textContent=flags.length?"Parameter-identification caution: "+flags.join("; ")+". Treat the fitted pair as indicative rather than a universal surface property.":"";
+ $("k").value=a.k;$("q").value=a.q;$("eps").value=eps;
+ $("reMinPlot").value=Math.min(...data.map(x=>x[0]));$("reMaxPlot").value=Math.max(...data.map(x=>x[0]));
+ drawPlot();
+ if(typeof draw2PNomogram==="function") draw2PNomogram();
+}
+function clearFit(){fitPoints=[];updateDataLegend();$("fitData").value="";["fitK","fitQ","fitEps","fitM2","fitMC","fitStatus"].forEach(id=>$(id).textContent="—");$("fitWarning").style.display="none";drawPlot();}
+
+function selectBotros(){ $("preset").value="botros:0"; loadPreset(); window.scrollTo({top:$("plot").getBoundingClientRect().top+window.scrollY-90,behavior:"smooth"}); }
+function contributionPayload(){
+ const data=parseData();
+ return {
+  schema:"lcadame-2p-contribution-v1",
+  created_at:new Date().toISOString(),
+  calculator_version:"1.6",
+  surface:{
+   material:$("matName").value.trim(),
+   condition:$("matCondition").value.trim(),
+   diameter_m:$("matD").value?+$("matD").value:null,
+   roughness_height_m:$("matRough").value?+$("matRough").value:null,
+   roughness_descriptor:$("matDescriptor").value.trim(),
+   organization:$("matOrg").value.trim(),
+   notes:$("matNotes").value.trim()
+  },
+  contributor:{
+   name:$("contribName").value.trim(),
+   email:$("contribEmail").value.trim(),
+   attribution:$("attribution").value,
+   rights_confirmed:$("rightsConsent").checked,
+   research_use_consent:$("researchConsent").checked,
+   contact_consent:$("contactConsent").checked
+  },
+  experimental_data:data.map(p=>({Re:p[0],darcy_f:p[1]})),
+  calibration:{
+   k:$("fitK").textContent!=="—"?+$("k").value:null,
+   q:$("fitQ").textContent!=="—"?+$("q").value:null,
+   colebrook_eps_over_D:$("fitEps").textContent!=="—"?+$("eps").value:null,
+   mape_2p:$("fitM2").textContent!=="—"?parseFloat($("fitM2").textContent):null,
+   mape_colebrook:$("fitMC").textContent!=="—"?parseFloat($("fitMC").textContent):null,
+   identification_note:$("fitStatus").textContent
+  }
+ };
+}
+async function prepareContribution(){
+ const payload=contributionPayload();
+ if(!payload.contributor.rights_confirmed||!payload.contributor.research_use_consent){
+   $("contribStatus").textContent="Contribution not prepared: both data-rights confirmation and research-use consent are required.";
+   return;
+ }
+ if(payload.experimental_data.length<3){
+   $("contribStatus").textContent="Please paste and fit at least three experimental Re,f points before preparing a contribution.";
+   return;
+ }
+ if(!payload.surface.material){
+   $("contribStatus").textContent="Please identify the material or surface before preparing a contribution.";
+   return;
+ }
+ if(CONTRIBUTION_ENDPOINT){
+   try{
+     const res=await fetch(CONTRIBUTION_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+     if(!res.ok)throw new Error("submission failed");
+     const j=await res.json();
+     $("contribStatus").textContent="Thank you. Dataset submitted for technical review. Reference: "+(j.reference||"received");
+     if(j.contributions!=null)$("globalContrib").textContent=Number(j.contributions).toLocaleString();
+     return;
+   }catch(e){
+     $("contribStatus").textContent="Online submission failed. A local contribution package will be downloaded instead.";
+   }
+ }
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download="2P_dataset_contribution_"+new Date().toISOString().slice(0,10)+".json";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+ $("contribStatus").textContent="Contribution package downloaded locally. In the deployed L'CADAME version, this can be sent securely after explicit consent.";
+}
+function clearContribution(){
+ ["matName","matCondition","matD","matRough","matDescriptor","matOrg","matNotes","contribName","contribEmail"].forEach(id=>$(id).value="");
+ ["rightsConsent","researchConsent","contactConsent"].forEach(id=>$(id).checked=false);
+ $("attribution").value="anonymous";$("contribStatus").textContent="";
+}
+
+let dbFilter="all";
+function setFilter(el){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));el.classList.add("active");dbFilter=el.dataset.filter;renderDB();}
+function renderDB(){
+ const body=$("dbBody"); if(!body)return; body.innerHTML="";
+ DB.filter(r=>dbFilter==="all"||r.status===dbFilter).forEach(r=>{
+  const tr=document.createElement("tr");
+  const dimStatus=(r.dimStatus||"").startsWith("exact")?"exact":((r.dimStatus||"").includes("not listed")?"not listed":"unresolved");
+  tr.innerHTML=`<td><span class="status ${r.status}">${r.status}</span></td>
+  <td>${r.source}</td><td>${r.surfaceClass}</td><td>${r.case}</td><td>${r.n}</td>
+  <td>${r.reMin.toLocaleString()}–${r.reMax.toLocaleString()}</td>
+  <td>${r.Dmm==null?"—":fmt(r.Dmm)}</td><td>${r.Rmm==null?"—":fmt(r.Rmm)}</td>
+  <td>${fmt(r.q)}</td><td>${fmt(r.k)}</td>
+  <td>${r.ldmm==null?"—":fmt(r.ldmm)}</td><td>${r.ltmm==null?"—":fmt(r.ltmm)}</td>
+  <td>${fmt(r.eps)}</td><td>${r.ksCmm==null?"—":fmt(r.ksCmm)}</td>
+  <td>${r.mape2p.toFixed(2)}%</td><td>${r.mapeCb.toFixed(2)}%</td><td>${dimStatus}</td>`;
+  body.appendChild(tr);
+ });
+}
+
+// ===== Interactive two-panel 2P friction chart =====
+const NOM_RE_FAMILY=[1e3,2e3,3e3,5e3,7e3,1e4,2e4,3e4,5e4,7e4,1e5,2e5,3e5,5e5,7e5,1e6,2e6,3e6,5e6,7e6,1e7,2e7,3e7,5e7,7e7,1e8];
+const NOM_RE_LABELS=[1e3,3e3,1e4,3e4,1e5,3e5,1e6,3e6,1e7,1e8];
+const NOM_K_FAMILY=[.0002,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.025,.03,.04,.05,.06,.0666,.10,.15];
+
+function nomClamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function nomX(Re,q){
+  Re=Math.max(1,+Re);q=Math.max(0,+q);
+  const aa=CBL/Math.pow(Re,.25)+q,bb=CE/Math.pow(Re,2/13)+q;
+  return Math.pow(Math.pow(aa,12)+Math.pow(bb,12),1/12);
+}
+function nomF(X,k){const rr=fr(k);return Math.pow(Math.pow(X,12)+Math.pow(rr,12),1/12)}
+function nomNice(v,d=4){
+  if(!Number.isFinite(v))return "—";
+  if(Math.abs(v)>=1e4||Math.abs(v)<1e-3)return v.toExponential(3);
+  return Number(v).toFixed(d).replace(/0+$/,"").replace(/\.$/,"");
+}
+function nomReLabel(r){let e=Math.floor(Math.log10(r)),m=r/Math.pow(10,e);return Math.abs(m-1)<1e-9?`10^${e}`:`${m.toFixed(0)}×10^${e}`}
+function nomSolveQ(R,Xtarget){
+  let lo=0,hi=.12;
+  if(nomX(R,lo)>Xtarget||nomX(R,hi)<Xtarget)return NaN;
+  for(let i=0;i<60;i++){let m=(lo+hi)/2;if(nomX(R,m)<Xtarget)lo=m;else hi=m}
+  return (lo+hi)/2;
+}
+function nomSolveRe(X,q){
+  let lo=3,hi=8;
+  if(X>=nomX(1e3,q))return 1e3;
+  if(X<=nomX(1e8,q))return 1e8;
+  for(let i=0;i<65;i++){let m=(lo+hi)/2,R=Math.pow(10,m);if(nomX(R,q)>X)lo=m;else hi=m}
+  return Math.pow(10,(lo+hi)/2);
+}
+function nomSolveK(X,f){
+  if(f<=X)return 0;
+  let lo=0,hi=.15;
+  for(let i=0;i<60;i++){let m=(lo+hi)/2;if(nomF(X,m)<f)lo=m;else hi=m}
+  return (lo+hi)/2;
+}
+function syncNomogramToQuick(){
+  $("nomRe").value=$("Re").value;
+  $("nomQ").value=$("q").value;
+  $("nomK").value=$("k").value;
+  draw2PNomogram();
+}
+function draw2PNomogram(){
+  const c=$("twoPNomogram");if(!c)return;
+  const ctx=c.getContext("2d"),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+
+  const Re=nomClamp(parseFloat($("nomRe").value)||1e5,1e3,1e8);
+  const q=nomClamp(parseFloat($("nomQ").value)||0,0,.10);
+  const k=nomClamp(parseFloat($("nomK").value)||0,0,.15);
+  const Xsel=nomX(Re,q),fsel=nomF(Xsel,k);
+
+  $("nomXOut").textContent=nomNice(Xsel,5);
+  $("nomFOut").textContent=nomNice(fsel,5);
+  $("nomReOut").textContent=Re.toExponential(3);
+  $("nomPathOut").textContent=`(${Re.toExponential(2)}, ${nomNice(q,4)}) → ${nomNice(Xsel,5)} → ${nomNice(fsel,5)}`;
+
+  const L=118,R=128,T=65,B=72,gap=56,panelH=(H-T-B-gap)/2;
+  const up={x:L,y:T,w:W-L-R,h:panelH};
+  const low={x:L,y:T+panelH+gap,w:W-L-R,h:panelH};
+  const xmin=.00555,xmax=.10,fmin=.0095,fmax=.10;
+
+  let qtop=.09;
+  {let lo=0,hi=.12;for(let i=0;i<60;i++){let m=(lo+hi)/2;if(nomX(1e8,m)<xmax)lo=m;else hi=m}qtop=(lo+hi)/2}
+
+  const lx=v=>Math.log10(v),xl=lx(xmin),xr=lx(xmax);
+  const px=v=>L+(lx(nomClamp(v,xmin,xmax))-xl)/(xr-xl)*up.w;
+  const pyF=v=>up.y+up.h-(Math.log10(nomClamp(v,fmin,fmax))-Math.log10(fmin))/(Math.log10(fmax)-Math.log10(fmin))*up.h;
+  const pyQ=v=>low.y+low.h-nomClamp(v,0,qtop)/qtop*low.h;
+
+  function line(x1,y1,x2,y2,col="#ccd5da",lw=1,dash=[]){
+    ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+  }
+  function txt(s,x,y,sz=18,col="#111",align="center",bold=false){
+    ctx.save();ctx.fillStyle=col;ctx.font=`${bold?"bold ":""}${sz}px Arial`;
+    ctx.textAlign=align;ctx.textBaseline="middle";ctx.fillText(s,x,y);ctx.restore();
+  }
+  function circle(x,y,r=7){
+    ctx.save();ctx.fillStyle="#fff";ctx.strokeStyle="#d51616";ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();ctx.stroke();ctx.restore();
+  }
+
+  ctx.strokeStyle="#16232b";ctx.lineWidth=2;
+  ctx.strokeRect(up.x,up.y,up.w,up.h);ctx.strokeRect(low.x,low.y,low.w,low.h);
+
+  const xt=[.006,.008,.010,.012,.015,.020,.025,.030,.040,.050,.060,.070,.080,.090,.100];
+  xt.forEach(v=>{
+    let x=px(v);
+    line(x,up.y,x,up.y+up.h,"#d7dde0",1);
+    line(x,low.y,x,low.y+low.h,"#d7dde0",1);
+    txt(v.toFixed(3),x,low.y-14,15);
+  });
+  txt("X(Re,q)",low.x+low.w/2,low.y+28,25);
+
+  const ft=[.010,.012,.015,.020,.025,.030,.035,.040,.045,.050,.055,.060,.070,.080,.090,.100];
+  ft.forEach(v=>{
+    let y=pyF(v);line(up.x,y,up.x+up.w,y,"#cbd3d7",1);
+    txt(v.toFixed(3),up.x-13,y,15,"#111","right");
+  });
+  txt("f₂P",32,up.y+up.h/2,24);
+
+  for(let v=0;v<=qtop+1e-9;v+=.01){
+    let y=pyQ(v),sel=Math.abs(v-q)<.0006;
+    line(low.x,y,low.x+low.w,y,"#d7dde0",1);
+    txt(v.toFixed(2),low.x-13,y,15,sel?"#d51616":"#111","right",sel);
+  }
+  txt("q",32,low.y+low.h/2,24);
+
+  function drawKCurve(kk,color,lw){
+    ctx.save();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();let st=false;
+    for(let i=0;i<550;i++){
+      let xx=Math.pow(10,xl+(xr-xl)*i/549),yy=nomF(xx,kk);
+      if(yy<fmin||yy>fmax)continue;
+      let xp=px(xx),yp=pyF(yy);
+      if(!st){ctx.moveTo(xp,yp);st=true}else ctx.lineTo(xp,yp);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  NOM_K_FAMILY.forEach(kk=>drawKCurve(kk,"#111",2));
+  drawKCurve(k,"#d51616",4);
+  NOM_K_FAMILY.forEach(kk=>{
+    let yy=fr(kk);
+    if(yy>=fmin&&yy<=fmax){
+      let sel=Math.abs(kk-k)<5e-5;
+      txt(nomNice(kk,4),up.x+up.w+12,pyF(yy),14,sel?"#d51616":"#111","left",sel);
+    }
+  });
+  txt("k",up.x+up.w+78,up.y+18,23);
+  line(px(Math.max(xmin,fmin)),pyF(Math.max(xmin,fmin)),px(xmax),pyF(xmax),"#111",3,[10,7]);
+
+  function drawReCurve(rr,color,lw){
+    ctx.save();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();let st=false;
+    for(let i=0;i<500;i++){
+      let qq=qtop*i/499,xx=nomX(rr,qq);
+      if(xx<xmin||xx>xmax)continue;
+      let xp=px(xx),yp=pyQ(qq);
+      if(!st){ctx.moveTo(xp,yp);st=true}else ctx.lineTo(xp,yp);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  NOM_RE_FAMILY.forEach(rr=>drawReCurve(rr,"#111",1.8));
+  drawReCurve(Re,"#d51616",4);
+
+  NOM_RE_LABELS.forEach(rr=>{
+    let qq=nomSolveQ(rr,xmax);
+    if(!Number.isFinite(qq)||qq>qtop+.0001)return;
+    let sel=Math.abs(Math.log(rr/Re))<.03;
+    txt(nomReLabel(rr),low.x+low.w+12,pyQ(qq),14,sel?"#d51616":"#111","left",sel);
+  });
+  txt("Re",low.x+low.w+82,low.y+18,23);
+
+  // Selected reading path:
+  // no full-height line through the lower plot.
+  const xp=px(nomClamp(Xsel,xmin,xmax)),yQ=pyQ(q),yF=pyF(fsel);
+
+  // q -> selected point
+  line(low.x,yQ,xp,yQ,"#d51616",2,[5,5]);
+
+  // selected lower point -> shared X axis only
+  line(xp,yQ,xp,low.y,"#d51616",2,[5,5]);
+
+  // shared X axis -> selected upper point only
+  line(xp,up.y+up.h,xp,yF,"#d51616",2,[5,5]);
+
+  circle(xp,yQ);
+  if(fsel>=fmin&&fsel<=fmax)circle(xp,yF);
+
+  txt(`Re=${Re.toExponential(2)}   q=${nomNice(q,4)}   X=${nomNice(Xsel,5)}   k=${nomNice(k,4)}   f₂P=${nomNice(fsel,5)}`,
+      W/2,H-28,19,"#0b253e","center",true);
+
+  c._nomGeom={up,low,xmin,xmax,fmin,fmax,qtop};
+}
+function handleNomogramClick(ev){
+  const c=$("twoPNomogram");if(!c||!c._nomGeom)return;
+  const r=c.getBoundingClientRect();
+  const x=(ev.clientX-r.left)*c.width/r.width,y=(ev.clientY-r.top)*c.height/r.height,g=c._nomGeom;
+  if(x<g.up.x||x>g.up.x+g.up.w)return;
+
+  const logX=Math.log10(g.xmin)+(x-g.up.x)/g.up.w*(Math.log10(g.xmax)-Math.log10(g.xmin));
+  const X=Math.pow(10,logX);
+
+  if(y>=g.low.y&&y<=g.low.y+g.low.h){
+    let qq=(g.low.y+g.low.h-y)/g.low.h*g.qtop;
+    qq=nomClamp(qq,0,.10);
+    $("nomQ").value=qq.toFixed(5);
+    $("nomRe").value=Math.round(nomSolveRe(X,qq));
+    draw2PNomogram();
+  }else if(y>=g.up.y&&y<=g.up.y+g.up.h){
+    const lf=Math.log10(g.fmin)+(g.up.y+g.up.h-y)/g.up.h*(Math.log10(g.fmax)-Math.log10(g.fmin));
+    $("nomK").value=nomSolveK(X,Math.pow(10,lf)).toFixed(6);
+    draw2PNomogram();
+  }
+}
+window.addEventListener("load",()=>{makePresets();renderDB();calculate();compareColebrook();drawPlot();syncNomogramToQuick();initUsageCounters();const nc=$("twoPNomogram");if(nc)nc.addEventListener("click",handleNomogramClick);});
+</script>
+
+<section class="card full" id="public-note">
+ <h2>Research and engineering use</h2>
+ <p class="note" style="font-size:12px;line-height:1.6">
+  This public calculator is a research and technical-evaluation tool. It is designed to support comparison, validation and discussion of the 2P methodology; it does not replace project-specific engineering judgment, applicable standards, inspection requirements or safety procedures.
+ </p>
+</section>
+
+
+
+
+
+
+<section class="c full" id="references" style="margin-top:14px">
+<h2>References</h2>
+<p class="n">Primary references used for the experimental database, conventional rough-pipe comparison, and interpretation of the roughness data.</p>
+<ol style="line-height:1.55;padding-left:22px">
+<li><b>Colebrook, C. F.</b> (1939). “Turbulent flow in pipes, with particular reference to the transition region between the smooth and rough pipe laws.” <i>Journal of the Institution of Civil Engineers</i>, 11(4), 133–156. <a href="https://doi.org/10.1680/ijoti.1939.13150" target="_blank" rel="noopener">doi:10.1680/ijoti.1939.13150</a>.</li>
+<li><b>Colebrook, C. F.; White, C. M.</b> (1937). “Experiments with fluid friction in roughened pipes.” <i>Proceedings of the Royal Society of London A</i>, 161(906), 367–381. <a href="https://doi.org/10.1098/rspa.1937.0150" target="_blank" rel="noopener">doi:10.1098/rspa.1937.0150</a>.</li>
+<li><b>Moody, L. F.</b> (1944). “Friction factors for pipe flow.” <i>Transactions of the ASME</i>, 66, 671–684.</li>
+<li><b>Olsson, C.-O.; Sundén, B.</b> (1996). “Heat transfer and pressure drop characteristics of ten radiator tubes.” <i>International Journal of Heat and Mass Transfer</i>, 39(15), 3211–3220.</li>
+<li><b>Yoo, D. H.; Singh, V. P.</b> (2005). “Two methods for the computation of commercial pipe friction factors.” <i>Journal of Hydraulic Engineering</i>, 131(8), 694–704. <a href="https://doi.org/10.1061/(ASCE)0733-9429(2005)131:8(694)" target="_blank" rel="noopener">doi:10.1061/(ASCE)0733-9429(2005)131:8(694)</a>.</li>
+<li><b>Taylor, R. P.; Scaggs, W. F.; Coleman, H. W.</b> (1988). “Measurement and prediction of the effects of nonuniform surface roughness on turbulent flow friction coefficients.” <i>Journal of Fluids Engineering</i>, 110(4), 380–384. <a href="https://doi.org/10.1115/1.3243567" target="_blank" rel="noopener">doi:10.1115/1.3243567</a>.</li>
+</ol>
+<div class="n" style="margin-top:10px">
+<b>Database note.</b> The 2P parameters <i>k</i> and <i>q</i> are fitted to the experimental friction data assembled from the sources above. 
+The Colebrook relative roughness ε/D is fitted independently to the same datasets for comparison. 
+The dimensional quantities ℓ<sub>t</sub>=kR and ℓ<sub>d</sub>=qR are the turbulent and dynamic roughness lengths used in this simulator.
+</div>
+</section>
+
+</body>
+</html>
